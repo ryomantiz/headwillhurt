@@ -1,0 +1,2736 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หัวจะปวด</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2.16.1/dist/easymde.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/easymde@2.16.1/dist/easymde.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.10/purify.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- Light Theme with Dark Blue Accents --- */
+        :root {
+            --primary-dark-blue: #1a237e; /* A deep, dark blue */
+            --secondary-blue: #283593; /* Slightly lighter blue */
+            --accent-blue: #3f51b5; /* Medium blue accent */
+            --light-blue: #e8eaf6; /* Very light blue background */
+            --text-color: #2d3748; /* Dark gray text for light background */
+            --text-color-dark: #1a202c; /* Even darker text/headings */
+            --background-color: #f7fafc; /* Very light background */
+            --card-background: #ffffff; /* White background for cards */
+            --border-color: #e2e8f0; /* Light gray border */
+            --hover-background: #ebf8ff; /* Light blue hover state */
+            /* Added green color for download button */
+            --green-button-bg: #4CAF50; /* Green 500 */
+            --green-button-hover-bg: #388E3C; /* Green 700 */
+            /* Added red color for like button */
+            --red-like: #e53935; /* Material Design Red 600 */
+            --red-like-hover: #c62828; /* Material Design Red 800 */
+        }
+
+        body {
+            font-family: 'Inter', 'Kanit', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 10vh; /* Adjusted min-height to prevent excessive scrolling on short content */
+            /* Added padding to prevent content from being hidden by fixed navbar */
+            padding-top: 70px; /* Adjust based on navbar height */
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+            /* No top padding needed here anymore, it's on the body */
+            padding-top: 0;
+        }
+        .navbar {
+            background-color: var(--card-background);
+            padding: 1rem 1.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000; /* Ensure it's above other content */
+            width: 100%; /* Make it span full width */
+            border-radius: 0; /* Ensure no border-radius on fixed bar */
+            margin-bottom: 0; /* Ensure no margin-bottom on fixed bar */
+            border-bottom: 1px solid var(--border-color); /* Add bottom border */
+            border-top: none;
+            border-left: none;
+            border-right: none;
+
+            /* Added flex properties for layout */
+            display: flex;
+            align-items: center; /* Vertically align items */
+            /* Removed justify-content: space-between; */ /* Removed to allow broadcast to span */
+            flex-wrap: wrap; /* Allow items to wrap if necessary */
+            min-height: 60px; /* Ensure a minimum height */
+        }
+        .navbar .app-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-dark-blue);
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+        .navbar a, .navbar button:not(.btn-icon) {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-left: 1rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+        .navbar a:hover, .navbar button:not(.btn-icon):hover {
+            background-color: var(--hover-background);
+            color: var(--primary-dark-blue);
+        }
+         .navbar .profile-img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 0.5rem;
+            border: 2px solid var(--border-color);
+             cursor: pointer;
+        }
+         .navbar .username-text {
+             margin-right: 0.5rem;
+             font-size: 0.9rem;
+             font-weight: 500;
+             color: var(--text-color);
+             cursor: pointer;
+         }
+         .navbar .btn-icon {
+             color: var(--text-color);
+             padding: 0.5rem;
+             border-radius: 50%;
+             transition: background-color 0.2s, color 0.2s;
+             margin-left: 0.5rem;
+         }
+         .btn-icon:hover {
+             background-color: var(--hover-background);
+             color: var(--primary-dark-blue);
+         }
+
+		/* Styles for Author Profile Photo in Post Header */
+		.author-profile-photo {
+			width: 200px; /* Corresponds to Tailwind w-16 */
+			height: 200px; /* Corresponds to Tailwind h-16 */
+			border-radius: 50%; /* Corresponds to Tailwind rounded-full */
+			object-fit: cover;
+			/* border: 2px solid #bfdbfe; Corresponds to Tailwind border-blue-200 */
+		}
+		.circular_image {
+		  width: 200px;
+		  height: 200px;
+		  border-radius: 50%;
+		  overflow: hidden;
+		  background-color: blue;
+		  /* commented for demo
+		  float: left;
+		  margin-left: 125px;
+		  margin-top: 20px;
+		  */
+		  
+		  /*for demo*/
+		  display:inline-block;
+		  vertical-align:middle;
+		}
+		.circular_image img{
+		  width:100%;
+		}
+		/* Keep the old class just in case, but make it similar */
+		.author-profile-photo-heading {
+			width: 50; /* Match the new style */
+			height: 50; /* Match the new style */
+			border-radius: 9999px; /* Match the new style */
+			object-fit: cover;
+			border: 2px solid #bfdbfe; /* Match the new style */
+		}
+
+		/* Adjust the article heading container margin if needed, based on the new header height */
+		.article-heading-container {
+			/* This might not be needed anymore with the new post-header div */
+			/* If you still need it for some reason, adjust the margin-top */
+			/* margin-top: -2rem; */
+		}
+
+        .card {
+            background-color: var(--card-background);
+            padding: 25px 30px;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+        }
+        .card h2 { /* This h2 is for general card titles, not the one removed from home-view */
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--primary-dark-blue);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+        .article-item {
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            margin-bottom: 1rem;
+            transition: background-color 0.2s ease-in-out;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .article-item:hover {
+            background-color: var(--hover-background);
+        }
+        .article-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .article-content-wrapper {
+            flex-grow: 1;
+        }
+        .article-item h3 {
+             font-size: 1.25rem;
+             font-weight: 500;
+             margin-bottom: 0.25rem;
+        }
+        .article-item h3 a {
+            color: var(--secondary-blue);
+            text-decoration: none;
+        }
+        .article-item h3 a:hover {
+            text-decoration: underline;
+            color: var(--primary-dark-blue);
+        }
+        .article-meta {
+            font-size: 0.8rem;
+            color: var(--text-color);
+            margin-bottom: 0;
+        }
+        .article-list-actions {
+            display: flex;
+            gap: 0.75rem; /* Increased gap */
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .article-list-actions .btn,
+        .article-list-actions .btn-like,
+        .article-list-actions .btn-download {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            gap: 0.3rem;
+        }
+        .article-list-actions .btn-icon {
+             padding: 0.3rem;
+             font-size: 0.9em;
+        }
+         .article-stats {
+             display: flex;
+             align-items: center;
+             gap: 0.5rem; /* Gap between stats */
+             font-size: 0.8rem;
+             color: var(--text-color);
+         }
+         .article-stats span {
+             display: flex;
+             align-items: center;
+             gap: 0.2rem;
+         }
+        button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn {
+            background-color: var(--primary-dark-blue);
+            color: white;
+            padding: 0.65rem 1.25rem;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+        }
+        .btn:hover {
+            background-color: var(--secondary-blue);
+        }
+        .btn:disabled {
+            background-color: #9fa8da;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background-color: #b0bec5;
+            color: var(--text-color-dark);
+        }
+        .btn-secondary:hover {
+            background-color: #90a4ae;
+        }
+         .btn-edit {
+            background-color: #ffb300;
+            color: var(--text-color-dark);
+        }
+        .btn-edit:hover {
+            background-color: #ffa000;
+        }
+        .btn-danger {
+            background-color: #ef5350;
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #e53935;
+        }
+        .btn-icon {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .btn-icon:hover {
+            background-color: var(--hover-background);
+            color: var(--primary-dark-blue);
+        }
+        .btn-icon.edit:hover { color: #ffb300; }
+        .btn-icon.delete:hover { color: #ef5350; }
+        .btn-download {
+            background-color: var(--green-button-bg);
+            color: white;
+        }
+        .btn-download:hover {
+            background-color: var(--green-button-hover-bg);
+        }
+        .btn-like {
+            background-color: #eeeeee;
+            color: var(--text-color);
+            padding: 0.5rem 0.75rem;
+            font-size: 0.85rem;
+        }
+        .btn-like:hover {
+             background-color: #e0e0e0;
+        }
+        .btn-like.liked {
+            background-color: var(--red-like);
+            color: white;
+        }
+        .btn-like.liked:hover {
+            background-color: var(--red-like-hover);
+        }
+         .btn-like .like-count {
+             margin-left: 0.3rem;
+             font-weight: 500;
+         }
+         .comment .btn-icon.like {
+             color: var(--text-color);
+             padding: 0.25rem;
+             font-size: 0.9em;
+         }
+         .comment .btn-icon.like:hover {
+             background-color: var(--hover-background);
+             color: var(--primary-dark-blue);
+         }
+         .comment .btn-icon.like.liked {
+             color: var(--red-like);
+         }
+          .comment .like-count {
+              font-size: 0.75em;
+              color: var(--text-color);
+              margin-left: 0.2rem;
+          }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.375rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--text-color);
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.65rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            background-color: #ffffff;
+            color: var(--text-color-dark);
+        }
+        .form-input:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);
+            outline: none;
+        }
+        .form-input:read-only {
+             background-color: #f5f5f5;
+             cursor: default;
+        }
+        .form-group textarea.form-input {
+            min-height: 120px;
+        }
+        .comment {
+            background-color: #e8eaf6;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 0.75rem;
+            border-left: 3px solid var(--accent-blue);
+            position: relative;
+            color: var(--text-color);
+            display: flex; /* Added flex for layout */
+            align-items: flex-start; /* Align items to the top */
+            gap: 1rem; /* Space between profile/name and comment text */
+        }
+        .comment p { margin: 0 0 0.25rem 0; }
+        .comment .commenter-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0; /* Prevent shrinking */
+            width: 130px; /* Fixed width for profile area */
+            text-align: center;
+            overflow: hidden; /* Hide overflowing text */
+        }
+        .comment .commenter-info img {
+            width: 100px; /* Profile image size */
+            height: 100px; /* Make it square */
+            border-radius: 10px; /* Slightly rounded corners for square */
+            object-fit: cover; /* Maintain aspect ratio */
+            margin-bottom: 0.25rem;
+            border: 2px solid var(--border-color);
+        }
+        .comment .comment-meta-bottom { /* Class for timestamp and name */
+            font-size: 0.75em;
+            color: var(--text-color);
+            margin-top: 0.25rem; /* Space above meta */
+            display: flex; /* Use flex to keep date and name on one line if space allows */
+            flex-wrap: wrap; /* Allow wrapping if needed */
+            gap: 0.5rem; /* Space between date and name */
+            justify-content: left; /* Center the meta info */
+        }
+         .comment .comment-meta-bottom span {
+             white-space: nowrap; /* Prevent wrapping within date/name */
+         }
+        .comment .comment-text-content {
+             flex-grow: 1; /* Allow comment text to take available space */
+        }
+        .comment-actions {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            display: flex;
+            gap: 0.25rem;
+        }
+         .comment-edit-area {
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+         .comment-edit-area textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            min-height: 80px;
+            margin-bottom: 0.5rem;
+            background-color: #ffffff;
+            color: var(--text-color-dark);
+        }
+         .comment-edit-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            align-items: center; /* Align items vertically */
+        }
+        .error-message, .info-message {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.9rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+        }
+        .error-message { color: #b71c1c; background-color: #ffcdd2; border: 1px solid #ef9a9a; }
+        .info-message { color: #1a237e; background-color: #e8eaf6; border: 1px solid #90caf9; }
+        .hidden { display: none !important; }
+        .editor-toolbar, .CodeMirror {
+            border-radius: 0.375rem;
+            border-color: var(--border-color) !important;
+            background-color: #ffffff;
+            color: var(--text-color-dark);
+        }
+         .editor-toolbar { background-color: #f5f5f5 !important; border-bottom: 1px solid var(--border-color); }
+         .editor-toolbar button { color: var(--text-color) !important; }
+         .editor-toolbar button.active, .editor-toolbar button:hover { background-color: var(--hover-background) !important; color: var(--primary-dark-blue) !important; }
+         .CodeMirror-scroll { background-color: #ffffff !important; }
+         .CodeMirror-cursor { border-left: 1px solid var(--text-color-dark) !important; }
+         .CodeMirror-selected { background-color: #e0e0e0 !important; }
+         .CodeMirror-lines { color: var(--text-color-dark); }
+        .CodeMirror-fullscreen { z-index: 1050 !important; }
+        /* Modified loading modal for full-screen operations */
+        #loading-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1100;
+        }
+        #loading-modal .content {
+            background-color: var(--card-background);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 44px 6px -2px rgba(0,0,0,0.05);
+            color: var(--text-color-dark);
+            border: 1px solid var(--border-color);
+        }
+         #loading-modal .spinner {
+             display: block;
+             color: var(--primary-dark-blue);
+             margin-bottom: 0.5rem;
+         }
+        .button-spinner { display: none !important; }
+        .search-container {
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .search-container input[type="search"] {
+            flex-grow: 1;
+        }
+         /* Removed styles for the cache button */
+         /* Removed styles for the status message below search */
+
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1200;
+        }
+        .modal-content {
+            background-color: var(--card-background);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 400px;
+            color: var(--text-color);
+        }
+        .modal-content h3 { margin-top: 0; margin-bottom: 1rem; font-size: 1.25rem; color: var(--primary-dark-blue);}
+        .modal-content .form-group { margin-bottom: 1rem; }
+        .modal-actions { margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.5rem; }
+        #emoji-modal .modal-content {
+            max-width: 350px;
+        }
+        #emoji-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
+            gap: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 5px;
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+        }
+        #emoji-list span {
+            cursor: pointer;
+            text-align: center;
+            padding: 3px;
+            border-radius: 4px;
+            transition: background-color 0.1s ease-in-out;
+            font-size: 1.5em;
+        }
+        #emoji-list span:hover {
+            background-color: var(--hover-background);
+        }
+        .markdown-content-wrapper {
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .markdown-content-wrapper h1,
+        .markdown-content-wrapper h2,
+        .markdown-content-wrapper h3,
+        .markdown-content-wrapper h4,
+        .markdown-content-wrapper h5,
+        .markdown-content-wrapper h6 {
+            font-weight: 600;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            color: var(--primary-dark-blue);
+        }
+        h1 { font-size: 2em; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        h2 { font-size: 1.75em; border-bottom: 1px solid var(--e0e0e0); padding-bottom: 10px; }
+        h3 { font-size: 1.5em; } h4 { font-size: 1.25em; } h5 { font-size: 1.1em; }
+        h6 { font-size: 1em; }
+        .markdown-content-wrapper ul, .markdown-content-wrapper ol {
+            margin-bottom: 1em;
+            list-style: initial;
+            padding-left: 2em;
+        }
+         .markdown-content-wrapper ul { list-style-type: disc; color: var(--text-color); }
+         .markdown-content-wrapper ol { list-style-type: decimal; color: var(--text-color); }
+        li { margin-bottom: 0.4em; color: var(--text-color); }
+         li > ul, li > ol {
+            margin-top: 0.5em;
+            margin-bottom: 0;
+         }
+         blockquote {
+            border-left: 5px solid var(--accent-blue);
+            padding: 10px 20px;
+            margin: 1.5em 0;
+            background-color: #e8eaf6;
+            color: var(--primary-dark-blue);
+            font-style: italic;
+            border-radius: 0 0.25rem 0.25rem 0;
+         }
+         code { background-color: #f5f5f5; padding: 0.2em 0.5em; border-radius: 4px; font-family: monospace; font-size: 0.9em; color: #e53935; }
+         pre { background-color: #e0e0e0; color: var(--text-color-dark); padding: 1em; border-radius: 6px; overflow-x: auto; border: 1px solid #cccccc; margin: 1.5em 0; }
+         pre code { background-color: transparent; padding: 0; border: none; color: inherit; font-size: 1em; }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 1.2em;
+            font-size: 0.95em;
+            border: 1px solid var(--border-color);
+         }
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 10px 12px;
+            text-align: left;
+            color: var(--text-color);
+         }
+         th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+            color: var(--text-color-dark);
+         }
+         tr:nth-child(even) {
+            background-color: #f8f8f8;
+         }
+         hr {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 2em 0;
+         }
+         a {
+            color: var(--primary-dark-blue);
+            text-decoration: underline;
+         }
+         a:hover {
+            color: var(--secondary-blue);
+         }
+         .markdown-content-wrapper img {
+            max-width: 100%;
+            width: 500px;
+            height: auto;
+            border-radius: 6px;
+            margin: 1.5em auto;
+            display: block;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+         }
+        /* Removed comment-input-container styles as button is moved */
+        /* Removed edit-comment-input-container styles as button is moved */
+
+        #landing-view .tab-content { display: none; }
+        #landing-view .tab-content.active { display: block; }
+        #landing-view .tabs button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background-color: transparent;
+            color: var(--text-color);
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        #landing-view .tabs button.active {
+            color: var(--primary-dark-blue);
+            border-bottom-color: var(--primary-dark-blue);
+        }
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: var(--card-background);
+            color: var(--text-color);
+            font-size: 0.875rem;
+            margin-top: auto;
+             border-top: 1px solid var(--border-color);
+        }
+        #landing-view .card {
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #landing-view .tabs {
+            margin-bottom: 20px;
+             justify-content: center;
+        }
+         #landing-view .tabs button {
+             padding: 0.5rem 1rem;
+             font-size: 0.9rem;
+         }
+        #landing-view h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+             text-align: center;
+        }
+        #login-tab, #register-tab {
+             text-align: center;
+        }
+        #login-form, #register-form {
+            space-y-3;
+            text-align: left;
+             max-width: 300px;
+             margin-left: auto;
+             margin-right: auto;
+        }
+        .form-group {
+            margin-bottom: 0.75rem;
+             text-align: left;
+        }
+         .form-group label {
+             font-size: 0.8rem;
+             margin-bottom: 0.25rem;
+         }
+         .form-input {
+             padding: 0.5rem 0.65rem;
+             font-size: 0.9rem;
+         }
+         .modal-content .form-group {
+             margin-bottom: 0.75rem;
+         }
+          .modal-content .form-group label {
+              font-size: 0.8rem;
+              margin-bottom: 0.25rem;
+          }
+           .modal-content .form-input {
+               padding: 0.5rem 0.65rem;
+               font-size: 0.9rem;
+           }
+            .modal-actions {
+                margin-top: 1rem;
+                 justify-content: center;
+            }
+             .modal-actions .btn {
+                 width: auto;
+             }
+        /* Centering action buttons in article detail view */
+        #article-detail-actions-top, #article-detail-actions-bottom {
+            justify-content: center; /* Added to center flex items */
+        }
+
+        /* New styles for specific loading states */
+        /* Dimming effect for comments section during comment operations */
+        #comments-section.comments-loading {
+            opacity: 0.6; /* Make it dimmer */
+            pointer-events: none; /* Prevent interaction */
+            transition: opacity 0.3s ease-in-out;
+        }
+        /* Loading text for article content and comments section */
+        .loading-text {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-color);
+            font-style: italic;
+        }
+
+        /* Style for comment input area when disabled/loading */
+        #comment-form.loading textarea {
+            background-color: #e0e0e0; /* Grey background */
+            cursor: not-allowed;
+            opacity: 0.7; /* Slightly transparent */
+        }
+        #comment-form.loading .comment-form-actions button {
+             pointer-events: none; /* Disable clicks on all buttons in actions div */
+             opacity: 0.7;
+        }
+        #comment-form.loading .comment-form-actions button.btn { /* Specific style for the submit button */
+             background-color: #9fa8da; /* Disabled button color */
+        }
+        #comment-form.loading .comment-form-actions button.btn-icon { /* Specific style for the emoji button */
+             color: #9fa8da; /* Disabled icon color */
+        }
+
+         /* New style for comment form actions layout */
+         .comment-form-actions {
+             display: flex;
+             align-items: center;
+             justify-content: flex-start; /* Align buttons to the right */
+             gap: 0.5rem; /* Space between buttons */
+         }
+
+         /* Style for broadcast text */
+         .broadcast-text {
+             font-size: 0.9rem;
+             color: var(--text-color);
+             margin-left: 0.5rem; /* Space after the pipe */
+             font-style: italic;
+             /* Removed nowrap, overflow, text-overflow */
+             flex-grow: 1; /* Allow it to take available space */
+             min-width: 0; /* Allow text to shrink below its content size */
+         }
+
+         /* Style for the container holding app title, pipe, and broadcast */
+         .navbar-left-section {
+             display: flex;
+             align-items: center;
+             flex-grow: 1; /* Allow this section to grow */
+             /* flex-wrap: wrap; /* Removed wrapping here, let broadcast text handle wrap */
+             min-width: 0; /* Allow the section to shrink */
+         }
+
+         /* Style for the container holding profile and nav links */
+         #nav-links {
+             display: flex;
+             align-items: center;
+             flex-shrink: 0; /* Prevent shrinking */
+             margin-left: auto; /* Push to the right */
+         }
+
+
+    </style>
+</head>
+<body class="flex flex-col">
+    <nav class="navbar">
+        <div class="navbar-left-section">
+             <span class="app-title">หัวจะปวด</span>
+             <span class="mx-2 text-gray-400">|</span> <span id="broadcast-message" class="broadcast-text">กำลังโหลดข้อความ Broadcast...</span>
+        </div>
+        <div id="nav-links"> </div>
+    </nav>
+
+    <div class="container">
+        <div id="global-message-area" class="mb-4">
+             <div id="error-display" class="error-message hidden"></div>
+             <div id="info-display" class="info-message hidden"></div>
+        </div>
+
+
+        <div id="landing-view" class="card hidden">
+            <div class="tabs flex border-b border-gray-300 mb-6">
+                <button onclick="showTab('login-tab')" class="tab-button active" id="login-tab-button">เข้าสู่ระบบ</button>
+                <button onclick="showTab('register-tab')" class="tab-button" id="register-tab-button">สมัครสมาชิก</button>
+            </div>
+
+            <div id="login-tab" class="tab-content active">
+
+                <form id="login-form" class="space-y-4">
+                    <div class="form-group">
+                        <label for="username">ชื่อผู้ใช้:</label>
+                        <input type="text" id="username" name="username" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">รหัสผ่าน:</label>
+                        <input type="password" id="password" name="password" required class="form-input">
+                    </div>
+                    <button type="submit" class="btn w-full"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ</button>
+                </form>
+            </div>
+
+            <div id="register-tab" class="tab-content">
+
+                <form id="register-form" class="space-y-4">
+                    <div class="form-group">
+                        <label for="reg-username">ชื่อผู้ใช้:</label>
+                        <input type="text" id="reg-username" name="reg-username" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-password">รหัสผ่าน (อย่างน้อย 6 ตัวอักษร):</label>
+                        <input type="password" id="reg-password" name="reg-password" required class="form-input" minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-confirm-password">ยืนยันรหัสผ่าน:</label>
+                        <input type="password" id="reg-confirm-password" name="reg-confirm-password" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-profile-image-url">URL รูปโปรไฟล์ (ไม่บังคับ):</label>
+                        <input type="url" id="reg-profile-image-url" name="reg-profile-image-url" class="form-input" placeholder="https://example.com/image.png">
+                    </div>
+                    <button type="submit" class="btn w-full"><i class="fas fa-user-plus"></i> สมัครสมาชิก</button>
+                </form>
+            </div>
+        </div>
+
+
+        <div id="home-view" class="card hidden">
+            <div class="search-container">
+                <input type="search" id="search-input" class="form-input" placeholder="ค้นหาบทความ (ตามชื่อเรื่อง หรือ ผู้แต่ง)...">
+                <button id="search-button" class="btn"><i class="fas fa-search"></i> </button>
+                </div>
+            <p id="cache-status-message" class="hidden"></p> <div id="articles-list">
+                </div>
+        </div>
+
+        <div id="article-detail-view" class="card hidden">
+             <div id="article-detail-actions-top" class="flex items-center justify-center space-x-2 mb-6"> </div>
+            <div id="article-content" class="markdown-content-wrapper">
+                </div>
+            <hr class="my-6 border-gray-300">
+             <div id="article-detail-actions-bottom" class="flex items-center justify-center space-x-2 mb-6"> </div>
+
+            <h3 class="text-xl font-semibold mb-3 text-gray-700">ความคิดเห็น</h3>
+            <div id="comments-section">
+                 </div>
+            <form id="comment-form" class="mt-6 space-y-3">
+                <input type="hidden" id="comment-article-id">
+                <div class="form-group">
+                     <label for="comment-text">แสดงความคิดเห็น:</label>
+                     <div> <textarea id="comment-text" rows="3" required class="form-input"></textarea>
+                     </div>
+                </div>
+                <div class="comment-form-actions"> <button type="submit" class="btn"><i class="fas fa-paper-plane"></i> ส่งความคิดเห็น</button>
+                    <button type="button" id="comment-emoji-button" class="btn-icon" title="แทรกอิโมจิ">
+                         <i class="fas fa-smile"></i>
+                     </button>
+                </div>
+            </form>
+        </div>
+
+        <div id="edit-article-view" class="card hidden">
+            <h2 id="edit-article-title-heading" class="text-2xl font-semibold mb-4">สร้างบทความใหม่</h2>
+            <form id="article-form" class="space-y-4">
+                <input type="hidden" id="edit-article-id-input">
+                <div class="form-group">
+                    <label for="article-title-input">ชื่อบทความ:</label>
+                    <input type="text" id="article-title-input" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="article-content-markdown">เนื้อหา (Markdown):</label>
+                    <textarea id="article-content-markdown"></textarea>
+                </div>
+                <div class="flex space-x-2">
+                    <button type="submit" class="btn"><i class="fas fa-save"></i> บันทึก</button> <button type="button" onclick="goBackOrHome()" class="btn btn-secondary"><i class="fas fa-times-circle"></i> ยกเลิก</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="edit-profile-view" class="card hidden">
+            <h2 class="text-2xl font-semibold mb-4">แก้ไขข้อมูลส่วนตัว</h2>
+            <form id="profile-form" class="space-y-4">
+                <div class="form-group">
+                    <label for="profile-username">ชื่อผู้ใช้ (ไม่สามารถแก้ไขได้):</label>
+                    <input type="text" id="profile-username" name="profile-username" readonly class="form-input bg-gray-100">
+                </div>
+                <div class="form-group">
+                    <label for="profile-new-password">รหัสผ่านใหม่ (เว้นว่างไว้หากไม่ต้องการเปลี่ยน):</label>
+                    <input type="password" id="profile-new-password" name="profile-new-password" class="form-input" minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="profile-confirm-new-password">ยืนยันรหัสผ่านใหม่:</label>
+                    <input type="password" id="profile-confirm-new-password" name="profile-confirm-new-password" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="profile-image-url-edit">URL รูปโปรไฟล์ใหม่:</label>
+                    <input type="url" id="profile-image-url-edit" name="profile-image-url-edit" class="form-input">
+                    <img id="profile-image-preview" src="#" alt="Profile Preview" class="mt-2 h-24 w-24 rounded-full object-cover border hidden">
+                </div>
+                <div class="flex space-x-2">
+                    <button type="submit" class="btn"><i class="fas fa-save"></i> บันทึกการเปลี่ยนแปลง</button>
+                    <button type="button" onclick="showView('home')" class="btn btn-secondary"><i class="fas fa-times-circle"></i> ยกเลิก</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <div id="loading-modal" class="hidden">
+        <div class="content">
+            <svg class="animate-spin h-8 w-8 mx-auto spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="mt-2 text-gray-700">กำลังประมวลผล...</p>
+        </div>
+    </div>
+
+    <div id="image-size-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>แทรกรูปภาพ</h3>
+            <div class="form-group">
+                <label for="image-url-modal">URL รูปภาพ:</label>
+                <input type="url" id="image-url-modal" class="form-input" required placeholder="เช่น https://example.com/image.jpg">
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="confirm-insert-image-btn" class="btn">แทรกรูปภาพ</button>
+                <button type="button" id="cancel-insert-image-btn" class="btn btn-secondary">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+     <div id="edit-comment-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>แก้ไขความคิดเห็น</h3>
+            <input type="hidden" id="edit-comment-id">
+             <div class="form-group">
+                 <label for="edit-comment-text">เนื้อหาความคิดเห็น:</label>
+                 <div> <textarea id="edit-comment-text" rows="5" required class="form-input"></textarea>
+                 </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="edit-comment-emoji-button" class="btn-icon" title="แทรกอิโมจิ">
+                    <i class="fas fa-smile"></i>
+                </button>
+                <button type="button" id="confirm-edit-comment-btn" class="btn">บันทึก</button>
+                <button type="button" id="cancel-edit-comment-btn" class="btn btn-secondary">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="emoji-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>เลือกอิโมจิ</h3>
+            <div id="emoji-list">
+                </div>
+             <div class="modal-actions mt-4">
+                 <button type="button" id="cancel-emoji-modal-btn" class="btn btn-secondary">ปิด</button>
+             </div>
+        </div>
+    </div>
+
+
+    <footer class="mt-auto">
+        <p>&copy; <span id="current-year"></span> หัวจะปวด@ryomantiz สงวนลิขสิทธิ์.</p>
+    </footer>
+
+    <script>
+        // IMPORTANT: Replace with your actual Google Apps Script Web App URL
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw3Bs2fWj3A7JpfhcPzz1rw3CYIGDEOtOGZRO2k4wECak9t42cBfMqgl7uJ9th9BKJdYA/exec"; // Updated URL
+
+        let easyMDE;
+        let currentUser = null;
+        let previousView = 'landing';
+        let currentArticleId = null;
+        let targetCommentTextarea = null;
+
+        // --- Caching Variables ---
+        let cachedArticles = null; // Cache for the list of articles on the home page
+        let cachedArticleDetails = {}; // Cache for individual article details, keyed by articleId
+
+        // --- Background Update Variables ---
+        let backgroundCountUpdateInterval = null;
+        let broadcastMessageInterval = null;
+        let broadcastMessages = [];
+        // Removed currentBroadcastIndex as we will use random selection
+
+
+        // --- DOM Elements ---
+        const views = {
+            landing: document.getElementById('landing-view'),
+            home: document.getElementById('home-view'),
+            articleDetail: document.getElementById('article-detail-view'),
+            editArticle: document.getElementById('edit-article-view'),
+            editProfile: document.getElementById('edit-profile-view'),
+        };
+        const navLinks = document.getElementById('nav-links');
+        const articlesList = document.getElementById('articles-list');
+        const articleContent = document.getElementById('article-content');
+        const commentsSection = document.getElementById('comments-section');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const articleForm = document.getElementById('article-form');
+        const commentForm = document.getElementById('comment-form');
+        const profileForm = document.getElementById('profile-form');
+
+        const loadingModal = document.getElementById('loading-modal'); // Full screen loader
+        const errorDisplay = document.getElementById('error-display');
+        const infoDisplay = document.getElementById('info-display');
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        // Removed cacheArticlesButton element reference
+        const cacheStatusMessage = document.getElementById('cache-status-message'); // Keep the element reference
+
+        const broadcastMessageElement = document.getElementById('broadcast-message');
+
+
+        const imageSizeModal = document.getElementById('image-size-modal');
+        const confirmInsertImageBtn = document.getElementById('confirm-insert-image-btn');
+        const cancelInsertImageBtn = document.getElementById('cancel-insert-image-btn');
+
+        const editCommentModal = document.getElementById('edit-comment-modal');
+        const editCommentIdInput = document.getElementById('edit-comment-id');
+        const editCommentTextInput = document.getElementById('edit-comment-text');
+        const confirmEditCommentBtn = document.getElementById('confirm-edit-comment-btn');
+        const cancelEditCommentBtn = document.getElementById('cancel-edit-comment-btn');
+
+        const emojiModal = document.getElementById('emoji-modal');
+        const emojiList = document.getElementById('emoji-list');
+        const cancelEmojiModalBtn = document.getElementById('cancel-emoji-modal-btn');
+        const commentEmojiButton = document.getElementById('comment-emoji-button');
+        const editCommentEmojiButton = document.getElementById('edit-comment-emoji-button');
+
+        const commentTextInput = document.getElementById('comment-text');
+        const commentSubmitButton = commentForm.querySelector('button[type="submit"]'); // Get the submit button
+
+        const articleDetailActionsTopDiv = document.getElementById('article-detail-actions-top');
+        const articleDetailActionsBottomDiv = document.getElementById('article-detail-actions-bottom');
+
+
+        // --- Utility Functions ---
+        function showTab(tabId) {
+            document.querySelectorAll('#landing-view .tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelectorAll('#landing-view .tab-button').forEach(button => button.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById(tabId + '-button').classList.add('active');
+        }
+
+        function showView(viewName, param = null, isBackAction = false) {
+            console.log(`Attempting to show view: ${viewName}, param: ${param}`);
+            if (!isBackAction) {
+                const currentActiveView = Object.keys(views).find(key => views[key] && !views[key].classList.contains('hidden'));
+                if (currentActiveView && currentActiveView !== viewName) {
+                    previousView = currentActiveView;
+                }
+            }
+
+            Object.values(views).forEach(view => view && view.classList.add('hidden'));
+            if (views[viewName]) {
+                views[viewName].classList.remove('hidden');
+            } else {
+                console.error("View not found:", viewName);
+                views.landing.classList.remove('hidden');
+            }
+
+            updateNav();
+            clearMessages();
+            // Hide cache status message when changing views
+            cacheStatusMessage.classList.add('hidden');
+
+
+            if (easyMDE && viewName !== 'editArticle') {
+                 try {
+                    easyMDE.toTextArea();
+                    easyMDE = null;
+                 } catch (e) {
+                    console.warn("Failed to destroy EasyMDE:", e);
+                 }
+            }
+
+            if (viewName === 'landing') showTab('login-tab');
+
+            // Manage background count update based on view
+            if (viewName === 'home' && currentUser) {
+                startBackgroundCountUpdate();
+            } else {
+                stopBackgroundCountUpdate();
+            }
+
+            // Always start broadcast update regardless of view, but fetch might be less frequent
+            startBroadcastUpdate();
+
+
+            // When navigating to home, always load articles with text loading
+            if (viewName === 'home') loadArticles(searchInput.value.trim());
+            if (viewName === 'articleDetail' && param) {
+                currentArticleId = param;
+                // loadArticleDetail will now handle its own text loading indicators and caching
+                loadArticleDetail(param);
+                document.getElementById('comment-article-id').value = param;
+            } else {
+                 currentArticleId = null;
+                 document.getElementById('comment-article-id').value = '';
+            }
+            if (viewName === 'editArticle') {
+                document.getElementById('edit-article-title-heading').textContent = param ? 'แก้ไขบทความ' : 'สร้างบทความใหม่';
+                document.getElementById('edit-article-id-input').value = param || '';
+                 if (!easyMDE) {
+                    easyMDE = new EasyMDE({
+                        element: document.getElementById("article-content-markdown"),
+                        spellChecker: false, promptURLs: true,
+                        toolbar: [
+                            "bold", "italic", "strikethrough", "heading", "|",
+                            "quote", "code", "unordered-list", "ordered-list", "|",
+                            "link", "table", "horizontal-rule", "|",
+                            {
+                                name: "emoji",
+                                action: openEmojiModalForArticle,
+                                className: "fa fa-smile",
+                                title: "แทรกอิโมจิ",
+                            },
+                             {
+                                name: "customImage",
+                                action: openImageSizeModal,
+                                className: "fa fa-image",
+                                title: "แทรกรูปภาพ",
+                            },
+                            "|", "fullscreen", "|", "guide"
+                        ],
+                    });
+                }
+                if (!param) {
+                    document.getElementById('article-title-input').value = "";
+                    if(easyMDE) easyMDE.value("");
+                } else {
+                    // If editing an existing article, load its content (will be handled by editArticle function)
+                }
+            }
+            if (viewName === 'editProfile' && currentUser) {
+                document.getElementById('profile-username').value = currentUser.username;
+                document.getElementById('profile-new-password').value = '';
+                document.getElementById('profile-confirm-new-password').value = '';
+                document.getElementById('profile-image-url-edit').value = currentUser.profileImageUrl || '';
+                const preview = document.getElementById('profile-image-preview');
+                if (currentUser.profileImageUrl) {
+                    preview.src = currentUser.profileImageUrl;
+                    preview.classList.remove('hidden');
+                } else {
+                    preview.classList.add('hidden');
+                }
+            }
+        }
+
+        function goBackOrHome() {
+            const articleIdInput = document.getElementById('edit-article-id-input').value;
+            if (previousView === 'articleDetail' && articleIdInput) {
+                 // When going back from edit to detail, clear the cache for this article
+                 delete cachedArticleDetails[articleIdInput];
+                 showView('articleDetail', articleIdInput, true);
+            } else if (currentUser) {
+                 // When going back to home, clear the articles list cache
+                 cachedArticles = null;
+                 showView('home', null, true);
+            } else {
+                 showView('landing', null, true);
+            }
+        }
+
+        // showLoading is now only for full-screen operations (login/signup)
+        function showLoading(show = true) {
+            if (show) {
+                loadingModal.classList.remove('hidden');
+            } else {
+                loadingModal.classList.add('hidden');
+            }
+        }
+
+        // Modified apiCall to accept a boolean parameter for showing the full screen loader
+        async function apiCall(action, method = 'GET', body = null, params = {}, showFullScreenLoader = false) { // Default to false
+            if (showFullScreenLoader) {
+                showLoading(true);
+            }
+
+            let url = `${GAS_WEB_APP_URL}?action=${action}`;
+            if (method === 'GET') {
+                Object.keys(params).forEach(key => url += `&${key}=${encodeURIComponent(params[key])}`);
+            }
+            const options = { method };
+            if (method === 'POST' && body) {
+                options.body = JSON.stringify({ action, ...body });
+                options.headers = { 'Content-Type': 'text/plain;charset=utf-8' };
+            }
+
+            try {
+                const response = await fetch(url, options);
+                const responseText = await response.text();
+
+                if (!response.ok) {
+                     console.error(`API Call Network Error: ${response.status} ${response.statusText}. Details: ${responseText}`);
+                     try {
+                         const errorData = JSON.parse(responseText);
+                         throw new Error(errorData.error || `Network error: ${response.status} ${response.statusText}`);
+                     } catch (parseError) {
+                         throw new Error(`Network error: ${response.status} ${response.statusText}. Response: ${responseText.substring(0, 200)}...`);
+                     }
+                }
+
+                const data = JSON.parse(responseText);
+                if (data.success === false && data.error) {
+                    console.error('API returned error:', data.error);
+                    throw new Error(data.error);
+                }
+                return data;
+            } catch (error) {
+                console.error('API Call Error:', error);
+                showMessage(`ข้อผิดพลาด: ${error.message}`, 'error');
+                throw error;
+            } finally {
+                if (showFullScreenLoader) {
+                    showLoading(false);
+                }
+            }
+        }
+
+        function showMessage(message, type = 'info') {
+            clearMessages();
+            const displayElement = type === 'error' ? errorDisplay : infoDisplay;
+            displayElement.textContent = message;
+            displayElement.classList.remove('hidden');
+        }
+        function clearMessages() {
+            errorDisplay.classList.add('hidden');
+            errorDisplay.textContent = '';
+            infoDisplay.classList.add('hidden');
+            infoDisplay.textContent = '';
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' };
+            try { return new Date(dateString).toLocaleDateString('th-TH', options); }
+            catch (e) { return dateString; }
+        }
+
+        function sanitizeHTML(htmlString) {
+            return DOMPurify.sanitize(htmlString, {
+                 USE_PROFILES: { html: true },
+                 ADD_TAGS: ['iframe', 'img', 'a', 'p', 'br', 'strong', 'em', 'del', 'code', 'pre', 'blockquote', 'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div'],
+                 ADD_ATTR: ['href', 'src', 'alt', 'title', 'width', 'height', 'class', 'style', 'id', 'loading', 'target', 'rel', 'allow', 'allowfullscreen', 'frameborder', 'scrolling', /^data-/, 'srcset', 'sizes'],
+                 ALLOW_DATA_ATTR: true
+            });
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = loginForm.username.value;
+            const password = loginForm.password.value;
+            try {
+                // Use full screen loader for login
+                const data = await apiCall('login', 'POST', { username, password }, {}, true); // showFullScreenLoader = true
+                if (data.success && data.user) {
+                    currentUser = data.user;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    // Clear caches on successful login
+                    cachedArticles = null;
+                    cachedArticleDetails = {};
+                    showView('home');
+                    showMessage('เข้าสู่ระบบสำเร็จ!', 'info');
+                }
+            } catch (error) { /* Handled by apiCall */ }
+        });
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('reg-username').value;
+            const password = document.getElementById('reg-password').value;
+            const confirmPassword = document.getElementById('reg-confirm-password').value;
+            let profileImageUrl = document.getElementById('reg-profile-image-url').value.trim();
+
+            if (password !== confirmPassword) {
+                showMessage("รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน", 'error'); return;
+            }
+            if (password.length < 6) {
+                showMessage("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร", 'error'); return;
+            }
+            if (!profileImageUrl) profileImageUrl = `https://placehold.co/100x100/CBD5E0/4A5568?text=${username.charAt(0).toUpperCase()}`;
+
+            try {
+                // Use full screen loader for registration
+                const data = await apiCall('registerUser', 'POST', { username, password, profileImageUrl }, {}, true); // showFullScreenLoader = true
+                if (data.success) {
+                    showMessage("สมัครสมาชิกสำเร็จ! บัญชีของคุณจะใช้งานได้หลังจากผู้ดูแลระบบอนุมัติ", 'info');
+                    showTab('login-tab');
+                    loginForm.username.value = username;
+                    loginForm.password.value = '';
+                    registerForm.reset();
+                }
+            } catch (error) { /* Handled by apiCall */ }
+        });
+
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) { showMessage("กรุณาเข้าสู่ระบบก่อน", "error"); return; }
+
+            const newPassword = document.getElementById('profile-new-password').value;
+            const confirmNewPassword = document.getElementById('profile-confirm-new-password').value;
+            const newProfileImageUrl = document.getElementById('profile-image-url-edit').value.trim();
+
+            if (newPassword && newPassword.length < 6) {
+                showMessage("รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร", "error"); return;
+            }
+            if (newPassword && newPassword !== confirmNewPassword) {
+                showMessage("รหัสผ่านใหม่และการยืนยันไม่ตรงกัน", "error"); return;
+            }
+
+            try {
+                const payload = { currentUsername: currentUser.username };
+                if (newPassword) payload.newPassword = newPassword;
+                if (newProfileImageUrl || newProfileImageUrl === "") payload.newProfileImageUrl = newProfileImageUrl;
+
+                // Use full screen loader for profile update
+                const data = await apiCall('updateUserProfile', 'POST', payload, {}, true); // showFullScreenLoader = true
+                if (data.success && data.user) {
+                    currentUser = data.user;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    updateNav();
+                    showMessage("อัปเดตข้อมูลส่วนตัวสำเร็จ!", "info");
+                    showView('home');
+                }
+            } catch (error) { /* Handled by apiCall */ }
+        });
+         document.getElementById('profile-image-url-edit').addEventListener('input', function(e) {
+            const preview = document.getElementById('profile-image-preview');
+            if (e.target.value) {
+                preview.src = e.target.value;
+                preview.classList.remove('hidden');
+            } else {
+                preview.classList.add('hidden');
+            }
+        });
+
+        function confirmLogout() {
+            if (confirm("คุณต้องการออกจากระบบหรือไม่?")) {
+                logout();
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            // Clear caches on logout
+            cachedArticles = null;
+            cachedArticleDetails = {};
+            stopBackgroundCountUpdate(); // Stop background updates on logout
+            if(easyMDE && easyMDE.element.parentNode) {
+                 try {
+                    easyMDE.toTextArea();
+                    easyMDE = null;
+                 } catch (e) {
+                    console.warn("Failed to destroy EasyMDE on logout:", e);
+                 }
+            }
+            showView('landing');
+            showMessage('ออกจากระบบแล้ว', 'info');
+        }
+
+        function updateNav() {
+            navLinks.innerHTML = '';
+            // The navLinks div is now the container for profile pic and user links
+            const profilePic = document.createElement('img');
+            profilePic.src = currentUser ? currentUser.profileImageUrl || `https://placehold.co/36x36/A0AEC0/FFFFFF?text=${currentUser.username.charAt(0).toUpperCase()}` : `https://placehold.co/36x36/A0AEC0/FFFFFF?text=G`; // Default for guest
+            profilePic.alt = currentUser ? currentUser.username : 'Guest';
+            profilePic.className = 'profile-img';
+            profilePic.onerror = () => { profilePic.src = currentUser ? `https://placehold.co/36x36/A0AEC0/FFFFFF?text=${currentUser.username.charAt(0).toUpperCase()}` : `https://placehold.co/36x36/A0AEC0/FFFFFF?text=G`; };
+            if (currentUser) {
+                 profilePic.onclick = (e) => { e.preventDefault(); showView('editProfile'); };
+            }
+            navLinks.appendChild(profilePic);
+
+            if (currentUser) {
+                const usernameSpan = document.createElement('span');
+                usernameSpan.className = 'username-text';
+                usernameSpan.textContent = currentUser.username + (currentUser.role === 'admin' ? ' (Admin)' : '');
+                 usernameSpan.onclick = (e) => { e.preventDefault(); showView('editProfile'); };
+                navLinks.appendChild(usernameSpan);
+
+                const homeButton = document.createElement('button');
+                homeButton.className = 'btn-icon';
+                homeButton.innerHTML = `<i class="fas fa-home"></i>`;
+                homeButton.title = "หน้าแรก";
+                homeButton.onclick = (e) => { e.preventDefault(); showView('home'); };
+                navLinks.appendChild(homeButton);
+
+                const createPostButton = document.createElement('button');
+                createPostButton.className = 'btn-icon';
+                createPostButton.innerHTML = `<i class="fas fa-plus"></i>`;
+                createPostButton.title = "สร้างโพสต์ใหม่";
+                createPostButton.onclick = (e) => { e.preventDefault(); showView('editArticle'); };
+                navLinks.appendChild(createPostButton);
+
+                const logoutButton = document.createElement('button');
+                logoutButton.className = 'btn-icon';
+                logoutButton.innerHTML = `<i class="fas fa-sign-out-alt"></i>`;
+                logoutButton.title = "ออกจากระบบ";
+                logoutButton.onclick = confirmLogout;
+                navLinks.appendChild(logoutButton);
+
+            } else {
+                 // No extra links for guest in this section, they are handled by landing view
+            }
+        }
+
+        searchButton.addEventListener('click', () => loadArticles(searchInput.value.trim()));
+        let searchTimeout;
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                loadArticles(e.target.value.trim());
+            }, 500);
+        });
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                 clearTimeout(searchTimeout);
+                 loadArticles(searchInput.value.trim());
+            }
+        });
+
+        // Removed the cacheArticlesButton event listener
+
+
+        async function loadArticles(searchTerm = '') {
+            // Check cache first for the list of articles
+            if (cachedArticles && !searchTerm) { // Only use cache if no search term
+                console.log("Serving articles list from cache...");
+                renderArticles(cachedArticles);
+                // Trigger background caching of details after rendering the list from cache
+                if (currentUser) { // Only cache details if user is logged in
+                    cacheAllArticleDetailsInBackground(cachedArticles);
+                }
+            } else {
+                 // Show loading text if not serving from cache or if searching
+                 articlesList.innerHTML = '<p class="loading-text">กำลังโหลดบทความ...</p>';
+                 cachedArticles = null; // Clear list cache if searching
+            }
+
+            try {
+                // Always fetch the latest list data from the backend
+                // Do NOT show full screen loader for loading article list
+                const data = await apiCall('getArticles', 'GET', null, { searchTerm, username: currentUser ? currentUser.username : '' }, false); // showFullScreenLoader = false
+
+                if (data.success && data.articles) {
+                    const fetchedArticles = data.articles;
+                    // Only re-render the full list if data changed significantly (new/deleted articles, or search term)
+                    // Or if the number of articles changed, or if it was previously empty
+                    const dataChangedSignificantly = !cachedArticles || cachedArticles.length !== fetchedArticles.length || searchTerm || (cachedArticles.length === 0 && fetchedArticles.length > 0);
+
+                    if (dataChangedSignificantly || !cachedArticles) {
+                         console.log("Articles data changed significantly, search performed, or no cache. Re-rendering list.");
+                         cachedArticles = searchTerm ? null : fetchedArticles; // Cache list only if no search term
+                         renderArticles(fetchedArticles);
+
+                         // Trigger background caching of details after rendering the list from the latest fetch
+                         if (currentUser && !searchTerm) { // Only cache details for the full list when not searching and user is logged in
+                             cacheAllArticleDetailsInBackground(fetchedArticles);
+                         }
+
+                    } else {
+                        console.log("Articles list structure unchanged. Updating counts if necessary.");
+                         // If using cache and data is unchanged structurally, update counts in background
+                         // The backgroundCountUpdate function will handle updating counts on the already rendered list
+                         // Clear the loading text if it was shown and data is unchanged
+                         if (articlesList.innerHTML.includes('กำลังโหลดบทความ')) {
+                             articlesList.innerHTML = ''; // Clear loading text if cache was used
+                             renderArticles(cachedArticles); // Re-render from cache just in case
+                         }
+                         // Trigger background caching of details even if list is from cache, to ensure detail data is fresh
+                         if (currentUser) {
+                              cacheAllArticleDetailsInBackground(cachedArticles);
+                         }
+                    }
+
+                } else if (data.success && (!data.articles || data.articles.length === 0)) { // No articles found
+                     if (!cachedArticles || searchTerm || (cachedArticles.length > 0 && (!data.articles || data.articles.length === 0))) { // Only update if no cache, searching, or articles were just removed
+                         articlesList.innerHTML = `<p class="text-gray-500 py-4 text-center">${searchTerm ? 'ไม่พบบทความที่ตรงกับการค้นหา' : 'ยังไม่มีบทความในระบบ'}</p>`;
+                         cachedArticles = searchTerm ? null : []; // Cache empty list if no search
+                         cachedArticleDetails = {}; // Clear detail cache if no articles
+                     }
+                } else { // API error fetching list
+                     if (!cachedArticles || searchTerm) { // Only show error if no cache or searching
+                          articlesList.innerHTML = '<p class="text-red-500 py-4 text-center">เกิดข้อผิดพลาดในการโหลดบทความ</p>';
+                          cachedArticles = null; // Clear cache on error
+                          cachedArticleDetails = {};
+                     }
+                }
+            } catch (error) {
+                 console.error("Error fetching articles:", error);
+                 if (!cachedArticles || searchTerm) { // Only show error if no cache or searching
+                      articlesList.innerHTML = '<p class="text-red-500 py-4 text-center">เกิดข้อผิดพลาดในการโหลดบทความ</p>';
+                      cachedArticles = null; // Clear cache on error
+                      cachedArticleDetails = {};
+                 }
+            }
+        }
+
+        // New function to fetch and cache ALL article details in the background
+        async function cacheAllArticleDetailsInBackground(articles) {
+             if (!articles || articles.length === 0) {
+                 console.log("No articles to cache details for.");
+                 return;
+             }
+             console.log(`Starting background caching of details for ${articles.length} articles...`);
+             // No visible status message or progress bar here
+
+             // Create a copy to avoid modifying the original array during async operations
+             const articlesToProcess = [...articles];
+
+             for (const article of articlesToProcess) {
+                 // Check if the article detail is already cached and up-to-date
+                 const cachedDetail = cachedArticleDetails[article.articleId];
+                 if (cachedDetail && cachedDetail.lastUpdatedDate === article.lastUpdatedDate) {
+                     // console.log(`Details for article ${article.articleId} are already up-to-date in cache.`);
+                     continue; // Skip fetching if already cached and not updated
+                 }
+
+                 try {
+                     // Fetch full details for each article silently
+                     const detailData = await apiCall('getArticle', 'GET', null, { articleId: article.articleId, username: currentUser ? currentUser.username : '' }, false); // showFullScreenLoader = false
+                     if (detailData.success && detailData.article) {
+                         cachedArticleDetails[article.articleId] = detailData.article; // Cache the full detail
+                         // console.log(`Cached details for article ${article.articleId}`);
+                     } else {
+                         console.warn(`Background caching failed for article ${article.articleId}: ${detailData.error || 'Unknown error'}`);
+                     }
+                 } catch (detailError) {
+                     console.error(`Error during background fetch for article ${article.articleId}:`, detailError);
+                 }
+                 // Add a small delay to avoid overwhelming the server
+                 await new Promise(resolve => setTimeout(resolve, 50)); // Delay of 50ms
+             }
+             console.log("Background caching of article details finished.");
+             // No final success message displayed
+        }
+
+        // Function to start background update for counts on home page
+        function startBackgroundCountUpdate() {
+            if (backgroundCountUpdateInterval !== null) {
+                console.log("Background count update already running.");
+                return; // Already running
+            }
+            console.log("Starting background count update interval...");
+            // Fetch counts every 1 second (1000 ms)
+            backgroundCountUpdateInterval = setInterval(async () => {
+                // Only run if user is logged in and on the home view
+                if (!currentUser || !views.home || views.home.classList.contains('hidden')) {
+                    console.log("Stopping background count update (user not logged in or not on home view).");
+                    stopBackgroundCountUpdate();
+                    return;
+                }
+
+                console.log("Fetching latest counts in background...");
+                try {
+                    // We need a lightweight API call to get counts for all articles currently in cachedArticles
+                    // Assuming the backend getArticles can return just counts if needed, or we need a new endpoint.
+                    // For now, let's fetch the full list and update counts from it.
+                    // This might be inefficient for many articles, a dedicated backend endpoint is better.
+                    const data = await apiCall('getArticles', 'GET', null, { username: currentUser.username }, false); // Fetch latest list data
+
+                    if (data.success && data.articles) {
+                         const latestArticles = data.articles;
+                         // Iterate through the currently displayed articles (using cachedArticles)
+                         // and update their counts based on the latest data
+                         if (cachedArticles) { // Ensure cachedArticles is not null
+                             cachedArticles.forEach(cachedArticle => {
+                                 const latestArticle = latestArticles.find(la => la.articleId === cachedArticle.articleId);
+                                 if (latestArticle) {
+                                     // Find the DOM element for this article
+                                     const articleElement = articlesList.querySelector(`.article-item[data-article-id="${cachedArticle.articleId}"]`);
+
+                                     if (articleElement) {
+                                         const commentCountSpan = articleElement.querySelector('.article-stats .fa-comment').nextElementSibling;
+                                         const likeCountSpan = articleElement.querySelector('.article-stats .fa-heart').nextElementSibling;
+
+                                         // Update DOM only if counts have changed
+                                         if (commentCountSpan && parseInt(commentCountSpan.textContent) !== latestArticle.commentCount) {
+                                             commentCountSpan.textContent = latestArticle.commentCount;
+                                             // console.log(`Updated comment count for ${cachedArticle.articleId}`); // Keep console log for debugging if needed
+                                         }
+                                         if (likeCountSpan && parseInt(likeCountSpan.textContent) !== latestArticle.likeCount) {
+                                             likeCountSpan.textContent = latestArticle.likeCount;
+                                              // console.log(`Updated like count for ${cachedArticle.articleId}`); // Keep console log for debugging if needed
+                                         }
+                                     }
+
+                                     // Update counts in cachedArticles as well
+                                     cachedArticle.commentCount = latestArticle.commentCount;
+                                     cachedArticle.likeCount = latestArticle.likeCount;
+                                 }
+                             });
+                         }
+                    } else {
+                         console.warn("Background count update failed to fetch articles:", data.error || "Unknown error");
+                    }
+
+                } catch (error) {
+                    console.error("Error during background count update:", error);
+                    // Silent failure, do not show message to user
+                }
+            }, 1000); // Update every 1 second (changed from 10000)
+        }
+
+        // Function to stop background update
+        function stopBackgroundCountUpdate() {
+            if (backgroundCountUpdateInterval !== null) {
+                console.log("Stopping background count update interval.");
+                clearInterval(backgroundCountUpdateInterval);
+                backgroundCountUpdateInterval = null;
+            }
+        }
+
+        // Function to fetch broadcast messages
+        async function fetchBroadcastMessages() {
+            console.log("Fetching broadcast messages...");
+            try {
+                // Do NOT show full screen loader for fetching broadcast messages
+                const data = await apiCall('getBroadcastMessages', 'GET', null, {}, false); // showFullScreenLoader = false
+                if (data.success && data.messages && data.messages.length > 0) {
+                    broadcastMessages = data.messages;
+                    // No need to reset index here, updateBroadcastText will handle random selection
+                    console.log(`Fetched ${broadcastMessages.length} broadcast messages.`);
+                } else {
+                    broadcastMessages = ["ไม่มีข้อความ Broadcast ในขณะนี้"]; // Default message if none found
+                    console.warn("No broadcast messages found or failed to fetch.");
+                }
+                 // Always update text after fetching, even if empty or failed, to show default/error message
+                 updateBroadcastText();
+            } catch (error) {
+                console.error("Error fetching broadcast messages:", error);
+                broadcastMessages = ["ไม่สามารถโหลดข้อความ Broadcast ได้"]; // Error message
+                updateBroadcastText(); // Show error message
+            }
+        }
+
+        // Function to update broadcast text on UI (now picks randomly)
+        function updateBroadcastText() {
+            if (broadcastMessages.length > 0) {
+                // Pick a random index
+                const randomIndex = Math.floor(Math.random() * broadcastMessages.length);
+                broadcastMessageElement.textContent = broadcastMessages[randomIndex];
+            } else {
+                 broadcastMessageElement.textContent = "ไม่มีข้อความ Broadcast ในขณะนี้"; // Fallback if no messages
+            }
+        }
+
+        // Function to start broadcast update interval
+        function startBroadcastUpdate() {
+             if (broadcastMessageInterval !== null) {
+                 console.log("Broadcast update already running.");
+                 return; // Already running
+             }
+             console.log("Starting broadcast update interval...");
+             // Fetch messages initially
+             fetchBroadcastMessages();
+             // Fetch new messages less frequently, e.g., every 5 minutes (300000 ms)
+             setInterval(fetchBroadcastMessages, 300000); // Fetch new messages every 5 minutes
+
+             // Update the displayed text every 10 seconds
+             broadcastMessageInterval = setInterval(updateBroadcastText, 10000); // Update text every 10 seconds
+        }
+
+        // Function to stop broadcast update interval
+        function stopBroadcastUpdate() {
+             if (broadcastMessageInterval !== null) {
+                 console.log("Stopping broadcast update interval.");
+                 clearInterval(broadcastMessageInterval);
+                 broadcastMessageInterval = null;
+             }
+             // Keep the broadcastMessages array as is
+        }
+
+
+        function renderArticles(articles) {
+             articlesList.innerHTML = ''; // Clear existing content
+             if (articles && articles.length > 0) {
+                 articles.forEach(article => {
+                     const articleDiv = document.createElement('div');
+                     articleDiv.className = 'article-item p-4 rounded-md transition-colors duration-150';
+                     // Add data-article-id for easy lookup later
+                     articleDiv.setAttribute('data-article-id', article.articleId);
+
+                     let actionButtonsHtml = `
+                         <div class="article-stats">
+							 <span><i class="fas fa-heart"></i> <span class="like-count">${article.likeCount || 0}</span></span>			                          
+                             <span><i class="fas fa-comment"></i> <span class="comment-count">${article.commentCount || 0}</span></span>
+    
+                         </div>
+                         <button class="btn btn-download" onclick="downloadArticleAsHTML('${article.articleId}')" ${currentUser ? '' : 'disabled'} title="${currentUser ? 'ดาวน์โหลด HTML' : 'เข้าสู่ระบบเพื่อดาวน์โหลด'}"><i class="fas fa-file-download"></i></button>
+                     `;
+
+                     // Corrected to use article.author which should contain the authorUsername from the backend
+                     articleDiv.innerHTML = `
+                         <div class="article-content-wrapper">
+                             <h3 class="text-xl mb-1"><a href="#" onclick="event.preventDefault(); showView('articleDetail', '${article.articleId}')">${sanitizeHTML(article.title)}</a></h3>
+                             <p class="article-meta text-sm text-gray-600">โดย: ${sanitizeHTML(article.author)} | เผยแพร่เมื่อ: ${formatDate(article.publishDate)}</p>
+                         </div>
+                         <div class="article-list-actions">
+                             ${actionButtonsHtml}
+                         </div>
+                     `;
+                     articlesList.appendChild(articleDiv);
+                 });
+             } else {
+                 articlesList.innerHTML = `<p class="text-gray-500 py-4 text-center">${searchInput.value.trim() ? 'ไม่พบบทความที่ตรงกับการค้นหา' : 'ยังไม่มีบทความในระบบ'}</p>`;
+             }
+        }
+
+
+        async function loadArticleDetail(articleId) {
+            if (!articleId) {
+                console.error("No articleId provided for loadArticleDetail");
+                return;
+            }
+            currentArticleId = articleId;
+            document.getElementById('comment-article-id').value = articleId;
+
+            // Check cache first for full article details
+            if (cachedArticleDetails[articleId]) {
+                 console.log(`Serving article ${articleId} details from cache...`);
+                 renderArticleDetail(cachedArticleDetails[articleId]);
+                 // Fetch latest in background to check for updates
+                 fetchLatestArticleDetailInBackground(articleId);
+            } else {
+                 // Show loading text indicators
+                 articleContent.innerHTML = '<p class="loading-text">กำลังโหลดเนื้อหาบทความ...</p>';
+                 commentsSection.innerHTML = '<p class="loading-text">กำลังโหลดความคิดเห็น...</p>';
+                 articleDetailActionsTopDiv.innerHTML = '';
+                 articleDetailActionsBottomDiv.innerHTML = '';
+
+                 // Fetch the article details from backend (this will be the initial load if not in cache)
+                 try {
+                     // Do NOT use full screen loader here, use text indicators
+                     const data = await apiCall('getArticle', 'GET', null, { articleId, username: currentUser ? currentUser.username : '' }, false); // showFullScreenLoader = false
+                     if (data.success && data.article) {
+                         cachedArticleDetails[articleId] = data.article; // Cache the fetched data
+                         renderArticleDetail(data.article);
+                     } else {
+                         // If API returns error or no article, clear cache and show error
+                         delete cachedArticleDetails[articleId];
+                         showView('home'); // Redirect to home
+                         showMessage(data.error || "ไม่พบบทความ", "error");
+                     }
+                 } catch (error) {
+                     console.error("Error fetching article detail:", error);
+                     // If API call fails, show error and redirect
+                      articleContent.innerHTML = '<p class="loading-text text-red-500">เกิดข้อผิดพลาดในการโหลดเนื้อหาบทความ</p>';
+                      commentsSection.innerHTML = '<p class="loading-text text-red-500">เกิดข้อผิดพลาดในการโหลดความคิดเห็น</p>';
+                      showView('home'); // Redirect to home
+                      showMessage("เกิดข้อผิดพลาดในการโหลดบทความ: " + error.message, "error");
+                 }
+            }
+        }
+
+        // New function to fetch latest article data in background for article detail view
+        async function fetchLatestArticleDetailInBackground(articleId) {
+             try {
+                 // Fetch latest data without showing full screen loader
+                 const data = await apiCall('getArticle', 'GET', null, { articleId, username: currentUser ? currentUser.username : '' }, false);
+                 if (data.success && data.article) {
+                     const cachedArticle = cachedArticleDetails[articleId];
+                     // Compare fetched data with cache
+                     const dataChanged = !cachedArticle ||
+                                         cachedArticle.lastUpdatedDate !== data.article.lastUpdatedDate ||
+                                         JSON.stringify(cachedArticle.comments) !== JSON.stringify(data.article.comments) || // Deep compare comments
+                                         cachedArticle.likeCount !== data.article.likeCount ||
+                                         cachedArticle.isLikedByCurrentUser !== data.article.isLikedByCurrentUser;
+
+                     if (dataChanged) {
+                         console.log(`Article ${articleId} data updated in background. Re-rendering detail view.`);
+                         cachedArticleDetails[articleId] = data.article; // Update cache
+                         renderArticleDetail(data.article); // Re-render with latest data
+                         // Removed: showMessage("ข้อมูลบทความถูกอัปเดตในพื้นหลังแล้ว", "info"); // Notify user
+                     } else {
+                         console.log(`Article ${articleId} data unchanged in background.`);
+                     }
+                 }
+             } catch (error) {
+                 console.error("Error fetching latest article detail in background:", error);
+                 // Error message is already handled by apiCall if needed, no need to show another one here.
+             }
+        }
+
+
+
+      
+        function renderArticleDetail(article) {
+             const parsedContent = DOMPurify.sanitize(marked.parse(article.contentMarkdown, { breaks: true }), {
+                  USE_PROFILES: { html: true },
+                  ADD_TAGS: ['iframe', 'img', 'a', 'p', 'br', 'strong', 'em', 'del', 'code', 'pre', 'blockquote', 'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div'],
+                  ADD_ATTR: ['href', 'src', 'alt', 'title', 'width', 'height', 'class', 'style', 'id', 'loading', 'target', 'rel', 'allow', 'allowfullscreen', 'frameborder', 'scrolling', /^data-/, 'srcset', 'sizes'],
+                  ALLOW_DATA_ATTR: true
+             });
+
+             articleContent.innerHTML = `
+                 <h2 class="text-3xl font-bold mb-2">${sanitizeHTML(article.title)}</h2>
+                 <p class="article-meta text-sm text-gray-600">
+                     โดย: ${sanitizeHTML(article.authorUsername)} | เผยแพร่เมื่อ: ${formatDate(article.publishDate)} | แก้ไขล่าสุด: ${formatDate(article.lastUpdatedDate)}
+                 </p>
+                 <div class="markdown-content-wrapper">${parsedContent}</div>`;
+
+             let detailActionButtonsHtmlTop = '';
+             let detailActionButtonsHtmlBottom = '';
+
+             const likeButtonBaseId = `article-like-button-${article.articleId}`;
+             const likeButtonHtml = `
+                 <button id="${likeButtonBaseId}" class="btn btn-like ${article.isLikedByCurrentUser ? 'liked' : ''}" title="ถูกใจ" data-article-id="${article.articleId}" ${currentUser ? '' : 'disabled'} title="${currentUser ? 'ถูกใจ' : 'เข้าสู่ระบบเพื่อถูกใจ'}">
+                      ❤️ <span class="like-count">${article.likeCount || 0}</span>
+                  </button>`;
+             detailActionButtonsHtmlTop += likeButtonHtml;
+             detailActionButtonsHtmlBottom += likeButtonHtml.replace(`id="${likeButtonBaseId}"`, `id="${likeButtonBaseId}-bottom"`);
+
+
+             const downloadButtonHtmlTop = `<button id="download-article-button-top-${article.articleId}" class="btn btn-download" ${currentUser ? '' : 'disabled'} title="${currentUser ? 'ดาวน์โหลด HTML' : 'เข้าสู่ระบบเพื่อดาวน์โหลด'}"><i class="fas fa-file-download"></i> ดาวน์โหลด HTML</button>`;
+             const downloadButtonHtmlBottom = `<button id="download-article-button-bottom-${article.articleId}" class="btn btn-download" ${currentUser ? '' : 'disabled'} title="${currentUser ? 'ดาวน์โหลด HTML' : 'เข้าสู่ระบบเพื่อดาวน์โหลด'}"><i class="fas fa-file-download"></i> ดาวน์โหลด HTML</button>`;
+             detailActionButtonsHtmlTop += downloadButtonHtmlTop;
+             detailActionButtonsHtmlBottom += downloadButtonHtmlBottom;
+
+
+             if (currentUser && (currentUser.username === article.authorUsername || currentUser.role === 'admin')) {
+                 const editDeleteButtonsHtml = `
+                     <button class="btn btn-edit" onclick="editArticle('${article.articleId}')" title="แก้ไข"><i class="fas fa-edit"></i> </button>
+                     <button class="btn btn-danger" onclick="deleteArticle('${article.articleId}')" title="ลบ"><i class="fas fa-trash-alt"></i> </button>
+                 `;
+                 detailActionButtonsHtmlTop += editDeleteButtonsHtml;
+                 detailActionButtonsHtmlBottom += editDeleteButtonsHtml;
+             }
+             articleDetailActionsTopDiv.innerHTML = detailActionButtonsHtmlTop;
+             articleDetailActionsBottomDiv.innerHTML = detailActionButtonsHtmlBottom;
+
+             const detailLikeButtonTopElem = document.getElementById(likeButtonBaseId);
+             const detailLikeButtonBottomElem = document.getElementById(`${likeButtonBaseId}-bottom`);
+
+             // Remove existing listeners before adding new ones to prevent duplicates
+             if (detailLikeButtonTopElem) detailLikeButtonTopElem.replaceWith(detailLikeButtonTopElem.cloneNode(true));
+             if (detailLikeButtonBottomElem) detailLikeButtonBottomElem.replaceWith(detailLikeButtonBottomElem.cloneNode(true));
+
+             const updatedDetailLikeButtonTopElem = document.getElementById(likeButtonBaseId);
+             const updatedDetailLikeButtonBottomElem = document.getElementById(`${likeButtonBaseId}-bottom`);
+
+
+             if (currentUser) {
+                  if (updatedDetailLikeButtonTopElem) {
+                       try { updatedDetailLikeButtonTopElem.addEventListener('click', () => toggleLikeArticle(article.articleId)); }
+                       catch (e) { console.error("Error attaching top detail like listener:", e); if(updatedDetailLikeButtonTopElem) {updatedDetailLikeButtonTopElem.disabled = true; updatedDetailLikeButtonTopElem.title = "เกิดข้อผิดพลาด";} }
+                  }
+                  if (updatedDetailLikeButtonBottomElem) {
+                      try { updatedDetailLikeButtonBottomElem.addEventListener('click', () => toggleLikeArticle(article.articleId)); }
+                       catch (e) { console.error("Error attaching bottom detail like listener:", e); if(updatedDetailLikeButtonBottomElem) {updatedDetailLikeButtonBottomElem.disabled = true; updatedDetailLikeButtonBottomElem.title = "เกิดข้อผิดพลาด";} }
+                  }
+             }
+
+             const downloadButtonTopElem = document.getElementById(`download-article-button-top-${article.articleId}`);
+             const downloadButtonBottomElem = document.getElementById(`download-article-button-bottom-${article.articleId}`);
+
+              // Remove existing listeners before adding new ones
+             if (downloadButtonTopElem) downloadButtonTopElem.replaceWith(downloadButtonTopElem.cloneNode(true));
+             if (downloadButtonBottomElem) downloadButtonBottomElem.replaceWith(downloadButtonBottomElem.cloneNode(true));
+
+             const updatedDownloadButtonTopElem = document.getElementById(`download-article-button-top-${article.articleId}`);
+             const updatedDownloadButtonBottomElem = document.getElementById(`download-article-button-bottom-${article.articleId}`);
+
+
+              if (currentUser) {
+                  if (updatedDownloadButtonTopElem) {
+                      try { updatedDownloadButtonTopElem.addEventListener('click', (event) => { event.stopPropagation(); downloadArticleAsHTML(article.articleId); });} // Added stopPropagation
+                      catch (e) { console.error("Error attaching top download listener:", e); if(updatedDownloadButtonTopElem) {updatedDownloadButtonTopElem.disabled = true; updatedDownloadButtonTopElem.title = "เกิดข้อผิดพลาด";} }
+                  }
+                  if (updatedDownloadButtonBottomElem) {
+                      try { updatedDownloadButtonBottomElem.addEventListener('click', (event) => { event.stopPropagation(); downloadArticleAsHTML(article.articleId); });} // Added stopPropagation
+                      catch (e) { console.error("Error attaching bottom download listener:", e); if(updatedDownloadButtonBottomElem) {updatedDownloadButtonBottomElem.disabled = true; updatedDownloadButtonBottomElem.title = "เกิดข้อผิดพลาด";} }
+                  }
+              }
+
+             // Render comments using the comments data already included in the article object
+             renderComments(article.comments);
+        }
+
+
+        // Function to render comments specifically (called by loadArticleDetail and comment actions)
+        function renderComments(comments) {
+            commentsSection.innerHTML = ''; // Clear existing comments
+            if (comments && comments.length > 0) {
+                // Sort comments by date ascending before rendering
+                const sortedComments = [...comments].sort((a, b) => new Date(a.commentDate) - new Date(b.commentDate));
+
+                sortedComments.forEach(comment => {
+                    const commentDiv = document.createElement('div');
+                    commentDiv.className = 'comment';
+                    // Use a data attribute to store the comment ID (real or temporary)
+                    commentDiv.setAttribute('data-comment-id', comment.commentId || `temp-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`); // Use temp ID if real ID is not available yet
+
+                    let actionsHtml = '';
+                    if (currentUser) {
+                        actionsHtml += `
+                            <button class="btn-icon like ${comment.isLikedByCurrentUser ? 'liked' : ''}" title="ถูกใจ" data-comment-id="${comment.commentId || ''}" ${comment.commentId ? '' : 'disabled'} >
+                                ❤️ <span class="like-count">${comment.likeCount || 0}</span>
+                            </button>
+                        `;
+                    }
+                    // Only show edit/delete if comment has a real ID (i.e., saved to backend)
+                    if (comment.commentId && currentUser && (currentUser.username === comment.commenterUsername || currentUser.role === 'admin')) {
+                        actionsHtml += `
+                                <button onclick="openEditCommentModal('${comment.commentId}', '${encodeURIComponent(comment.commentText)}')" class="btn-icon edit" title="แก้ไขคอมเมนต์">
+                                    <i class="fas fa-edit fa-xs"></i>
+                                </button>
+                                <button onclick="deleteComment('${comment.commentId}')" class="btn-icon delete" title="ลบคอมเมนต์">
+                                    <i class="fas fa-trash-alt fa-xs"></i>
+                                </button>
+                           `;
+                    }
+                    commentDiv.innerHTML = `
+                        <div class="comment-actions">
+                             ${actionsHtml}
+                        </div>
+                        <div class="commenter-info">
+                             <img src="${comment.commenterProfileImageUrl || `https://placehold.co/40x40/A0AEC0/FFFFFF?text=${comment.commenterUsername.charAt(0).toUpperCase()}`}" alt="${sanitizeHTML(comment.commenterUsername)}" onerror="this.onerror=null;this.src='https://placehold.co/40x40/A0AEC0/FFFFFF?text=${comment.commenterUsername.charAt(0).toUpperCase()}';">
+                             </div>
+                        <div class="comment-text-content">
+                            <p>${sanitizeHTML(comment.commentText)}</p>
+                            <p class="comment-meta-bottom">
+                                <span class="comment-date">${formatDate(comment.commentDate)}</span> |
+                                <span class="commenter-name-below">${sanitizeHTML(comment.commenterUsername)}</span>
+                            </p>
+                         </div>
+                         <div class="comment-edit-area hidden">
+                             <textarea class="comment-edit-textarea form-input" rows="3"></textarea>
+                             <div class="comment-edit-actions">
+                                 <button class="btn btn-sm btn-edit save-edit-comment"><i class="fas fa-save"></i> บันทึก</button>
+                                 <button class="btn btn-sm btn-secondary cancel-edit-comment"><i class="fas fa-times-circle"></i> ยกเลิก</button>
+                             </div>
+                         </div>
+                    `;
+                     // Append the commenter name below the timestamp
+                     const commentMetaBottom = commentDiv.querySelector('.comment-meta-bottom');
+                     const commenterNameSpan = commentDiv.querySelector('.commenter-name-below');
+                     if (commentMetaBottom && commenterNameSpan) {
+                          // The HTML structure already places it correctly, just ensure the class is right
+                          // No need to re-append, just ensure the class exists in the HTML above
+                     }
+
+
+                    commentsSection.appendChild(commentDiv);
+                });
+
+                 // Add event listeners for comment like buttons after rendering
+                 // Only add listeners to buttons with a real commentId
+                 commentsSection.querySelectorAll('.comment .btn-icon.like[data-comment-id]').forEach(button => {
+                     try { button.addEventListener('click', handleCommentLikeClick); }
+                     catch (e) { console.error("Error attaching comment like listener:", e); button.disabled = true; button.title = "เกิดข้อผิดพลาด"; }
+                 });
+            } else {
+                commentsSection.innerHTML = '<p class="text-gray-500">ยังไม่มีความคิดเห็น</p>';
+            }
+        }
+
+
+        articleForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) {
+                 showMessage("กรุณาเข้าสู่ระบบเพื่อดำเนินการ", "error");
+                 return;
+            }
+
+            const title = document.getElementById('article-title-input').value;
+            const contentMarkdown = easyMDE.value();
+            const articleId = document.getElementById('edit-article-id-input').value;
+
+            if (!title.trim() || !contentMarkdown.trim()) {
+                showMessage("กรุณากรอกชื่อบทความและเนื้อหา", "error"); return;
+            }
+            try {
+                let data;
+                // Use full screen loader for saving/updating article
+                if (articleId) {
+                    data = await apiCall('updateArticle', 'POST', { articleId, title, contentMarkdown, editorUsername: currentUser.username }, {}, true); // showFullScreenLoader = true
+                } else {
+                    data = await apiCall('createArticle', 'POST', { title, contentMarkdown, authorUsername: currentUser.username }, {}, true); // showFullScreenLoader = true
+                }
+                if (data.success) {
+                    const targetArticleId = articleId || data.articleId;
+                    // Clear relevant caches after a write operation
+                    cachedArticles = null; // Article list changed
+                    delete cachedArticleDetails[targetArticleId]; // This specific article changed
+
+                    showView('articleDetail', targetArticleId);
+                    showMessage(articleId ? "อัปเดตบทความสำเร็จ!" : "สร้างบทความสำเร็จ!", "info");
+                }
+            } catch (error) { /* Handled by apiCall */ }
+        });
+
+        async function editArticle(articleId) {
+             if (!easyMDE) {
+                 easyMDE = new EasyMDE({
+                    element: document.getElementById("article-content-markdown"),
+                    spellChecker: false, promptURLs: true,
+                    toolbar: [
+                        "bold", "italic", "strikethrough", "heading", "|",
+                        "quote", "code", "unordered-list", "ordered-list", "|",
+                        "link", "table", "horizontal-rule", "|",
+                        { name: "emoji", action: openEmojiModalForArticle, className: "fa fa-smile", title: "แทรกอิโมจิ" },
+                        { name: "customImage", action: openImageSizeModal, className: "fa fa-image", title: "แทรกรูปภาพ" },
+                        "|", "fullscreen", "|", "guide"
+                    ],
+                });
+             }
+             // Check cache first for article content when editing
+             if (cachedArticleDetails[articleId] && cachedArticleDetails[articleId].contentMarkdown) {
+                 console.log(`Serving article content for editing from cache for ${articleId}...`);
+                 document.getElementById('article-title-input').value = cachedArticleDetails[articleId].title;
+                 easyMDE.value(cachedArticleDetails[articleId].contentMarkdown);
+                 document.getElementById('edit-article-id-input').value = articleId;
+                 showView('editArticle', articleId);
+                 // Fetch latest in background
+                 fetchLatestArticleForEdit(articleId);
+             } else {
+                 // Show full screen loader only if no cache is available
+                 showLoading(true);
+                 try {
+                     const data = await apiCall('getArticle', 'GET', null, { articleId }, false); // showFullScreenLoader handled by outer logic
+                     if (data.success && data.article) {
+                         document.getElementById('article-title-input').value = data.article.title;
+                         easyMDE.value(data.article.contentMarkdown);
+                         document.getElementById('edit-article-id-input').value = articleId;
+                         cachedArticleDetails[articleId] = data.article; // Cache the fetched data
+                         showView('editArticle', articleId);
+                     }
+                 } catch (error) { /* Handled by apiCall */
+                 } finally {
+                     showLoading(false);
+                 }
+             }
+        }
+
+        // New function to fetch latest article data in background for editing
+        async function fetchLatestArticleForEdit(articleId) {
+             try {
+                 const data = await apiCall('getArticle', 'GET', null, { articleId }, false); // No full screen loader
+                 if (data.success && data.article) {
+                     const cachedArticle = cachedArticleDetails[articleId];
+                     // Compare fetched data with cache
+                     if (!cachedArticle || cachedArticle.lastUpdatedDate !== data.article.lastUpdatedDate) {
+                         console.log(`Article ${articleId} data updated in background. Updating editor.`);
+                         // Update the editor and cache if data changed
+                         document.getElementById('article-title-input').value = data.article.title;
+                         easyMDE.value(data.article.contentMarkdown);
+                         cachedArticleDetails[articleId] = data.article; // Update cache
+                         // Removed: showMessage("บทความถูกอัปเดตในพื้นหลังแล้ว", "info"); // Notify user
+                     } else {
+                         console.log(`Article ${articleId} data unchanged in background.`);
+                     }
+                 }
+             } catch (error) {
+                 console.error("Error fetching latest article for edit in background:", error);
+             }
+        }
+
+
+       async function deleteArticle(articleId) {
+            if (!currentUser) { showMessage("กรุณาเข้าสู่ระบบ", "error"); return; }
+            if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบบทความนี้? การกระทำนี้ไม่สามารถย้อนกลับได้ และจะลบคอมเมนต์ทั้งหมดที่เกี่ยวข้องด้วย")) {
+                try {
+                    // Use full screen loader for deleting article
+                    const data = await apiCall('deleteArticle', 'POST', { articleId, deleterUsername: currentUser.username }, {}, true); // showFullScreenLoader = true
+                    if (data.success) {
+                        // Clear relevant caches after a write operation
+                        cachedArticles = null; // Article list changed
+                        delete cachedArticleDetails[articleId]; // This specific article deleted
+
+                        showMessage("บทความถูกลบแล้ว", "info");
+                        showView('home');
+                    }
+                } catch (error) { /* Handled by apiCall */ }
+            }
+        }
+
+        async function downloadArticleAsHTML(articleId) {
+            if (!currentUser) {
+                 showMessage("กรุณาเข้าสู่ระบบเพื่อดาวน์โหลดบทความ", "error");
+                 return;
+            }
+            // Check cache first for article content for download
+            if (cachedArticleDetails[articleId] && cachedArticleDetails[articleId].contentMarkdown) {
+                 console.log(`Serving article content for download from cache for ${articleId}...`);
+                 generateDownloadHTML(cachedArticleDetails[articleId]);
+                 // Fetch latest in background (optional for download, but good for cache consistency)
+                 fetchLatestArticleForDownload(articleId);
+            } else {
+                 // Show full screen loader only if no cache is available
+                 showLoading(true);
+                 try {
+                     const data = await apiCall('getArticle', 'GET', null, { articleId }, false); // showFullScreenLoader handled by outer logic
+                     if (data.success && data.article) {
+                         cachedArticleDetails[articleId] = data.article; // Cache the fetched data
+                         generateDownloadHTML(data.article);
+                     }
+                 } catch (error) { /* Handled by apiCall */
+                 } finally {
+                     showLoading(false);
+                 }
+            }
+        }
+
+        // New function to fetch latest article data in background for download (updates cache)
+        async function fetchLatestArticleForDownload(articleId) {
+             try {
+                 const data = await apiCall('getArticle', 'GET', null, { articleId }, false); // No full screen loader
+                 if (data.success && data.article) {
+                     const cachedArticle = cachedArticleDetails[articleId];
+                     // Update cache if data changed
+                     if (!cachedArticle || cachedArticle.lastUpdatedDate !== data.article.lastUpdatedDate) {
+                         console.log(`Article ${articleId} data updated in background. Updating cache.`);
+                         cachedArticleDetails[articleId] = data.article; // Update cache
+                     } else {
+                         console.log(`Article ${articleId} data unchanged in background.`);
+                     }
+                 }
+             } catch (error) {
+                 console.error("Error fetching latest article for download in background:", error);
+             }
+        }
+
+
+        function generateDownloadHTML(article) {
+             const parsedContent = DOMPurify.sanitize(marked.parse(article.contentMarkdown, { breaks: true }), {
+                  USE_PROFILES: { html: true },
+                  ADD_TAGS: ['iframe', 'img', 'a', 'p', 'br', 'strong', 'em', 'del', 'code', 'pre', 'blockquote', 'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div'],
+                  ADD_ATTR: ['href', 'src', 'alt', 'title', 'width', 'height', 'class', 'style', 'id', 'loading', 'target', 'rel', 'allow', 'allowfullscreen', 'frameborder', 'scrolling', /^data-/, 'srcset', 'sizes'],
+                  ALLOW_DATA_ATTR: true
+             });
+
+             const inlineCss = `
+                 body { font-family: 'Inter', 'Kanit', sans-serif; line-height: 1.6; margin: 20px; background-color: #f7fafc; color: #2d3748; }
+                 .article-container { background-color: #ffffff; padding: 25px 35px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); max-width: 800px; margin: 20px auto; border: 1px solid #e2e8f0; }
+                 h1, h2, h3, h4, h5, h6 { font-weight: 600; margin-top: 1.5em; margin-bottom: 0.5em; color: #1a237e; }
+                 h1 { font-size: 2em; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+                 h2 { font-size: 1.75em; border-bottom: 1px solid #e0e0e0; padding-bottom: 10px; }
+                 h3 { font-size: 1.5em; } h4 { font-size: 1.25em; } h5 { font-size: 1.1em; } h6 { font-size: 1em; }
+                 .meta { font-size: 0.85em; color: #2d3748; margin-bottom: 20px; }
+                 img { max-width: 100%; width: 500px; height: auto; border-radius: 6px; margin: 1.5em auto; display: block; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+                 p { margin-bottom: 1em; color: #2d3748; }
+                 ul, ol { margin-bottom: 1em; padding-left: 2em; list-style: initial; }
+                 ul { list-style-type: disc; color: #2d3748; } ol { list-style-type: decimal; color: #2d3748; }
+                 li { margin-bottom: 0.4em; color: #2d3748; }
+                 li > ul, li > ol { margin-top: 0.5em; margin-bottom: 0; }
+                 blockquote { border-left: 5px solid #3f51b5; padding: 10px 20px; margin: 1.5em 0; background-color: #e8eaf6; color: #1a237e; font-style: italic; border-radius: 0 0.25rem 0.25rem 0; }
+                 code { background-color: #f5f5f5; padding: 0.2em 0.5em; border-radius: 4px; font-family: monospace; font-size: 0.9em; color: #e53935; }
+                 pre { background-color: #e0e0e0; color: #1a202c; padding: 1em; border-radius: 6px; overflow-x: auto; border: 1px solid #cccccc; margin: 1.5em 0; }
+                 pre code { background-color: transparent; padding: 0; border: none; color: inherit; font-size: 1em; }
+                 table { border-collapse: collapse; width: 100%; margin-bottom: 1.2em; font-size: 0.95em; border: 1px solid var(--border-color); }
+                 th, td { border: 1px solid #e0e0e0; padding: 10px 12px; text-align: left; color: var(--text-color); }
+                 th { background-color: #f5f5f5; font-weight: 600; color: #1a202c; }
+                 tr:nth-child(even) { background-color: #f8f8f8; }
+                 hr { border: none; border-top: 1px solid var(--border-color); margin: 2em 0; }
+                 a { color: var(--primary-dark-blue); text-decoration: underline; }
+                 a:hover { color: var(--secondary-blue); }
+             `;
+             const articleHtmlContent = `
+                 <!DOCTYPE html>
+                 <html lang="th">
+                 <head>
+                     <meta charset="UTF-8">
+                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                     <title>${sanitizeHTML(article.title)}</title>
+                     <style>${inlineCss}</style>
+                 </head>
+                 <body>
+                     <div class="article-container">
+                         <h1>${sanitizeHTML(article.title)}</h1>
+                         <p class="meta">
+                             โดย: ${sanitizeHTML(article.authorUsername)} | เผยแพร่เมื่อ: ${formatDate(article.publishDate)}
+                             ${article.publishDate !== article.lastUpdatedDate ? ` | แก้ไขล่าสุด: ${formatDate(article.lastUpdatedDate)}` : ''}
+                         </p>
+                         <hr>
+                         <div>${parsedContent}</div>
+                     </div>
+                 </body>
+                 </html>`;
+
+             const blob = new Blob([articleHtmlContent], { type: 'text/html;charset=utf-8' });
+             const link = document.createElement('a');
+             link.href = URL.createObjectURL(blob);
+             link.download = `${article.title.replace(/[^a-z0-9ก-๙]/gi, '_').toLowerCase() || 'article'}.html`;
+             document.body.appendChild(link);
+             link.click();
+             document.body.removeChild(link);
+             URL.revokeObjectURL(link.href);
+        }
+
+
+        commentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const articleId = document.getElementById('comment-article-id').value;
+            const commentText = document.getElementById('comment-text').value.trim(); // Trim whitespace
+            let commenterUsername;
+            let commenterProfileImageUrl;
+
+            if (currentUser) {
+                 commenterUsername = currentUser.username;
+                 commenterProfileImageUrl = currentUser.profileImageUrl;
+            } else {
+                 showMessage("กรุณาเข้าสู่ระบบเพื่อแสดงความคิดเห็น", "error");
+                 return;
+            }
+            if (!articleId) {
+                showMessage("เกิดข้อผิดพลาด: ไม่พบ ID ของบทความ กรุณาลองโหลดหน้าใหม่อีกครั้ง", "error");
+                return;
+            }
+            if (!commentText) { // Check after trim
+                showMessage("กรุณากรอกความคิดเห็น", "error"); return;
+            }
+
+            // --- Optimistic UI Update ---
+            // Generate a temporary ID for the optimistic comment
+            const tempCommentId = `temp-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+            const optimisticComment = {
+                commentId: tempCommentId, // Use temporary ID
+                articleId: articleId,
+                commentText: commentText,
+                commenterUsername: commenterUsername,
+                commenterProfileImageUrl: commenterProfileImageUrl,
+                commentDate: new Date().toISOString(), // Use current time for sorting
+                likeCount: 0, // Start with 0 likes optimistically
+                isLikedByCurrentUser: false // Not liked by current user initially
+            };
+
+            // Add optimistic comment to cache
+            if (cachedArticleDetails[articleId]) {
+                 // Ensure comments array exists and push the new comment
+                 if (!cachedArticleDetails[articleId].comments) {
+                      cachedArticleDetails[articleId].comments = [];
+                 }
+                 cachedArticleDetails[articleId].comments.push(optimisticComment);
+                 // Sort comments by date after adding the new one
+                 cachedArticleDetails[articleId].comments.sort((a, b) => new Date(a.commentDate) - new Date(b.commentDate));
+            } else {
+                 // This case should ideally not happen if loadArticleDetail was called, but as a fallback
+                 cachedArticleDetails[articleId] = { comments: [optimisticComment] };
+            }
+
+            // Render comments immediately from the updated cache
+            renderComments(cachedArticleDetails[articleId].comments);
+
+            // Disable form and clear input
+            commentForm.classList.add('loading');
+            commentTextInput.disabled = true;
+            commentForm.querySelector('.comment-form-actions').querySelectorAll('button').forEach(btn => btn.disabled = true);
+            commentForm.reset(); // Clear the input field
+
+
+            // --- Background API Call ---
+            // Use an Immediately Invoked Async Function Expression (IIAFE) to run the API call in the background
+            (async () => {
+                try {
+                    // Do NOT show full screen loader for comment submission
+                    const data = await apiCall('addComment', 'POST', { articleId, commentText, commenterUsername }, {}, false); // showFullScreenLoader = false
+                    if (data.success) {
+                        console.log("Comment successfully sent to backend:", data);
+                        showMessage("เพิ่มความคิดเห็นสำเร็จ!", "info");
+                        // Clear relevant caches so loadArticleDetail fetches fresh data
+                        delete cachedArticleDetails[articleId];
+                        cachedArticles = null; // Comment count might change on article list
+
+                        // Fetch the updated article details (which includes comments) in the background
+                        const updatedData = await apiCall('getArticle', 'GET', null, { articleId, username: currentUser ? currentUser.username : '' }, false);
+                        if (updatedData.success && updatedData.article) {
+                             cachedArticleDetails[articleId] = updatedData.article; // Update cache
+                             renderComments(cachedArticleDetails[articleId].comments); // Re-render comments with latest data
+                        } else {
+                            console.error("Failed to fetch updated article details after comment success:", updatedData.error || 'Unknown error');
+                            // If fetching updated details fails, maybe just show the optimistic one?
+                            // Or show an error that comments might not be fully up-to-date?
+                            // For now, let's just log the error and keep the optimistic one until a full reload.
+                        }
+
+                    } else {
+                        console.error("Backend reported failure adding comment:", data.error);
+                        showMessage(data.error || "เกิดข้อผิดพลาดในการส่งความคิดเห็น", "error");
+                        // If API fails, fetch the actual comments from backend to revert optimistic change
+                        const actualData = await apiCall('getArticle', 'GET', null, { articleId, username: currentUser ? currentUser.username : '' }, false);
+                        if (actualData.success && actualData.article) {
+                            cachedArticleDetails[articleId] = actualData.article; // Update cache
+                            renderComments(actualData.article.comments); // Re-render comments with actual data
+                        } else {
+                            console.error("Failed to fetch actual article details after comment failure:", actualData.error || 'Unknown error');
+                            // If even fetching actual details fails, clear comments to avoid showing incorrect state
+                            commentsSection.innerHTML = '<p class="text-red-500">เกิดข้อผิดพลาดในการโหลดความคิดเห็นล่าสุด</p>';
+                            if (cachedArticleDetails[articleId]) cachedArticleDetails[articleId].comments = [];
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error during addComment API call:", error);
+                    showMessage("เกิดข้อผิดพลาดในการเชื่อมต่อ: ไม่สามารถส่งความคิดเห็นได้", "error");
+                    // On network error, fetch actual comments to revert optimistic change
+                     const actualData = await apiCall('getArticle', 'GET', null, { articleId, username: currentUser ? currentUser.username : '' }, false);
+                     if (actualData.success && actualData.article) {
+                         cachedArticleDetails[articleId] = actualData.article; // Update cache
+                         renderComments(actualData.article.comments); // Re-render comments with actual data
+                     } else {
+                         console.error("Failed to fetch actual article details after comment network error:", actualData.error || 'Unknown error');
+                         commentsSection.innerHTML = '<p class="text-red-500">เกิดข้อผิดพลาดในการโหลดความคิดเห็นล่าสุด</p>';
+                         if (cachedArticleDetails[articleId]) cachedArticleDetails[articleId].comments = [];
+                     }
+                } finally {
+                     // Re-enable form and button after the background API call finishes (or fails)
+                     commentForm.classList.remove('loading');
+                     commentTextInput.disabled = false;
+                     commentForm.querySelector('.comment-form-actions').querySelectorAll('button').forEach(btn => btn.disabled = false);
+                }
+            })(); // End of IIAFE
+        });
+
+        function openEditCommentModal(commentId, currentTextEncoded) {
+             const currentText = decodeURIComponent(currentTextEncoded);
+             editCommentIdInput.value = commentId;
+             editCommentTextInput.value = currentText;
+             editCommentModal.classList.remove('hidden');
+             targetCommentTextarea = editCommentTextInput;
+        }
+
+        confirmEditCommentBtn.addEventListener('click', async (e) => {
+            const commentId = editCommentIdInput.value;
+            const newCommentText = editCommentTextInput.value.trim();
+            if (!newCommentText) {
+                showMessage("กรุณากรอกเนื้อหาความคิดเห็น", "error"); return;
+            }
+             if (!currentUser) {
+                 showMessage("คุณต้องเข้าสู่ระบบเพื่อแก้ไขความคิดเห็น", "error"); return;
+             }
+
+            // Dim the comments section before editing
+            commentsSection.classList.add('comments-loading');
+
+            try {
+                // Do NOT show full screen loader for comment editing
+                const data = await apiCall('updateComment', 'POST', {
+                    commentId: commentId, newCommentText: newCommentText, editorUsername: currentUser.username
+                }, {}, false); // showFullScreenLoader = false
+                if (data.success) {
+                    showMessage("แก้ไขความคิดเห็นสำเร็จ!", "info");
+                    editCommentModal.classList.add('hidden');
+                    if (currentArticleId) {
+                        // Clear the cache for the current article after updating a comment
+                        delete cachedArticleDetails[currentArticleId];
+                         // Also clear the articles list cache as comment count might change (less likely but possible if a comment was deleted and re-added)
+                         cachedArticles = null;
+                        // Fetch updated article details (which includes comments) and re-render comments
+                        const updatedData = await apiCall('getArticle', 'GET', null, { articleId: currentArticleId, username: currentUser ? currentUser.username : '' }, false);
+                        if (updatedData.success && updatedData.article) {
+                             cachedArticleDetails[currentArticleId] = updatedData.article; // Update cache
+                             renderComments(cachedArticleDetails[currentArticleId].comments); // Re-render comments
+                        } else {
+                             console.error("Failed to fetch updated article details after comment edit success:", updatedData.error || 'Unknown error');
+                             // If fetching updated details fails, maybe just show the info message
+                        }
+                    } else {
+                         showMessage("แก้ไขความคิดเห็นสำเร็จ แต่ไม่สามารถโหลดความคิดเห็นใหม่ได้", "info");
+                    }
+                }
+            } catch (error) { /* Handled by apiCall */
+            } finally {
+                 // Remove dimming regardless of success or failure
+                 commentsSection.classList.remove('comments-loading');
+            }
+        });
+
+        cancelEditCommentBtn.addEventListener('click', () => {
+            editCommentModal.classList.add('hidden');
+             targetCommentTextarea = null;
+        });
+
+        async function deleteComment(commentId) {
+            if (!currentUser) { showMessage("กรุณาเข้าสู่ระบบ", "error"); return; }
+            if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบคอมเมนต์นี้?")) {
+
+                // Dim the comments section before deleting
+                commentsSection.classList.add('comments-loading');
+
+                try {
+                    // Do NOT show full screen loader for comment deletion
+                    const data = await apiCall('deleteComment', 'POST', { commentId, deleterUsername: currentUser.username }, {}, false); // showFullScreenLoader = false
+                    if (data.success) {
+                        showMessage("ลบคอมเมนต์สำเร็จ!", "info");
+                         if (currentArticleId) {
+                            // Clear the cache for the current article after deleting a comment
+                            delete cachedArticleDetails[currentArticleId];
+                             // Also clear the articles list cache as comment count might change
+                             cachedArticles = null;
+                            // Fetch updated article details (which includes comments) and re-render comments
+                             const updatedData = await apiCall('getArticle', 'GET', null, { articleId: currentArticleId, username: currentUser ? currentUser.username : '' }, false);
+                             if (updatedData.success && updatedData.article) {
+                                  cachedArticleDetails[currentArticleId] = updatedData.article; // Update cache
+                                  renderComments(cachedArticleDetails[currentArticleId].comments); // Re-render comments
+                             } else {
+                                  console.error("Failed to fetch updated article details after comment delete success:", updatedData.error || 'Unknown error');
+                             }
+                        } else {
+                            showMessage("ลบคอมเมนต์สำเร็จ แต่ไม่สามารถโหลดความคิดเห็นใหม่ได้", "info");
+                        }
+                    }
+                } catch (error) { /* Handled by apiCall */
+                } finally {
+                     // Remove dimming regardless of success or failure
+                     commentsSection.classList.remove('comments-loading');
+                }
+            }
+        }
+
+        function openImageSizeModal() {
+             imageSizeModal.classList.remove('hidden');
+             document.getElementById('image-url-modal').value = '';
+        }
+        cancelInsertImageBtn.addEventListener('click', () => {
+            imageSizeModal.classList.add('hidden');
+        });
+        confirmInsertImageBtn.addEventListener('click', (e) => {
+            const url = document.getElementById('image-url-modal').value.trim();
+            if (!url) {
+                showMessage("กรุณาใส่ URL ของรูปภาพ", "error"); return;
+            }
+            const imgHtmlTag = `<img src="${sanitizeHTML(url)}" alt="Image" style="width: 500px; height: auto; display: block; margin-top: 1.5em; margin-bottom: 1.5em;">`;
+            if (easyMDE) {
+                const cm = easyMDE.codemirror;
+                const doc = cm.getDoc();
+                const cursor = doc.getCursor();
+                doc.replaceRange(imgHtmlTag, cursor);
+            }
+            imageSizeModal.classList.add('hidden');
+        });
+
+        const commonEmojis = [
+            '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '😘', '😗', '😙', '😚', '😋', '😛', '😜', '🤪', '😝', '🤗', '🤭', '🤫', '🤔', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔', '😟', '😕', '🙁', '☹️', '😫', '😩', '😤', '😠', '😡', '🤬', '😈', '👿', '💀', '👻', '👽', '🤖', '💩', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾',
+            '👍', '👎', '👋', '👏', '🙏', '❤️', '💔', '✨', '🌟', '🎉', '🎂', '🎁', '🎄', '🎅', '🔥', '💯', '✅', '❌', '❓', '❗', '❤️', '😊', '👍', '🤔', '😂', '😭', '🥺', '🙏', '✨', '🎉'
+        ];
+        function populateEmojiList() {
+            emojiList.innerHTML = '';
+            commonEmojis.forEach(emoji => {
+                const span = document.createElement('span');
+                span.textContent = emoji;
+                span.title = emoji;
+                span.style.fontSize = '1.5em';
+                span.addEventListener('click', () => insertEmojiInTarget(emoji));
+                emojiList.appendChild(span);
+            });
+        }
+        function openEmojiModalForArticle() {
+             targetCommentTextarea = null; populateEmojiList(); emojiModal.classList.remove('hidden');
+        }
+        function openEmojiModalForComment() {
+             targetCommentTextarea = commentTextInput; populateEmojiList(); emojiModal.classList.remove('hidden');
+        }
+        function openEmojiModalForEditComment() {
+             targetCommentTextarea = editCommentTextInput; populateEmojiList(); emojiModal.classList.remove('hidden');
+        }
+        function insertEmojiInTarget(emoji) {
+            if (targetCommentTextarea) {
+                 const textarea = targetCommentTextarea;
+                 const start = textarea.selectionStart;
+                 const end = textarea.selectionEnd;
+                 textarea.value = textarea.value.substring(0, start) + emoji + textarea.value.substring(end);
+                 textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+                 textarea.focus();
+            } else if (easyMDE) {
+                const cm = easyMDE.codemirror;
+                const doc = cm.getDoc();
+                const cursor = doc.getCursor();
+                doc.replaceRange(emoji, cursor);
+            }
+            emojiModal.classList.add('hidden');
+        }
+        cancelEmojiModalBtn.addEventListener('click', () => {
+            emojiModal.classList.add('hidden'); targetCommentTextarea = null;
+        });
+        commentEmojiButton.addEventListener('click', openEmojiModalForComment);
+        editCommentEmojiButton.addEventListener('click', openEmojiModalForEditComment);
+
+        async function toggleLikeArticle(articleId) {
+            if (!currentUser) {
+                showMessage("กรุณาเข้าสู่ระบบเพื่อกดถูกใจ", "error"); return;
+            }
+            const likeButtonTop = document.getElementById(`article-like-button-${articleId}`);
+            const likeButtonBottom = document.getElementById(`article-like-button-${articleId}-bottom`);
+
+            const isLiked = likeButtonTop ? likeButtonTop.classList.contains('liked') : (likeButtonBottom ? likeButtonBottom.classList.contains('liked') : false);
+            const action = isLiked ? 'unlikeArticle' : 'likeArticle';
+
+            let currentCountTop = likeButtonTop ? parseInt(likeButtonTop.querySelector('.like-count').textContent) || 0 : 0;
+            let currentCountBottom = likeButtonBottom ? parseInt(likeButtonBottom.querySelector('.like-count').textContent) || 0 : 0;
+
+            // Optimistically update UI
+            if (isLiked) {
+                if (likeButtonTop) { likeButtonTop.classList.remove('liked'); likeButtonTop.querySelector('.like-count').textContent = Math.max(0, currentCountTop - 1); }
+                if (likeButtonBottom) { likeButtonBottom.classList.remove('liked'); likeButtonBottom.querySelector('.like-count').textContent = Math.max(0, currentCountBottom - 1); }
+            } else {
+                if (likeButtonTop) { likeButtonTop.classList.add('liked'); likeButtonTop.querySelector('.like-count').textContent = currentCountTop + 1; }
+                if (likeButtonBottom) { likeButtonBottom.classList.add('liked'); likeButtonBottom.querySelector('.like-count').textContent = currentCountBottom + 1; }
+            }
+            if (likeButtonTop) likeButtonTop.disabled = true;
+            if (likeButtonBottom) likeButtonBottom.disabled = true;
+
+            try {
+                // Do NOT show full screen loader for liking/unliking article
+                const data = await apiCall(action, 'POST', { articleId: articleId, username: currentUser.username }, {}, false); // showFullScreenLoader = false
+                if (data.success) {
+                    // Update with actual count from backend
+                    if (likeButtonTop) likeButtonTop.querySelector('.like-count').textContent = data.likeCount;
+                    if (likeButtonBottom) likeButtonBottom.querySelector('.like-count').textContent = data.likeCount;
+                    if (data.isLikedByCurrentUser) {
+                        if (likeButtonTop) likeButtonTop.classList.add('liked');
+                        if (likeButtonBottom) likeButtonBottom.classList.add('liked');
+                    } else {
+                        if (likeButtonTop) likeButtonTop.classList.remove('liked');
+                        if (likeButtonBottom) likeButtonBottom.classList.remove('liked');
+                    }
+                    // Update cache for this article's like info
+                    if (cachedArticleDetails[articleId]) {
+                         cachedArticleDetails[articleId].likeCount = data.likeCount;
+                         cachedArticleDetails[articleId].isLikedByCurrentUser = data.isLikedByCurrentUser;
+                         // No need to clear cachedArticles here for just a like count change
+                         // as the list view doesn't auto-update like counts in real-time.
+                    }
+                } else {
+                     showMessage(data.error || "เกิดข้อผิดพลาดในการอัปเดตถูกใจ", "error");
+                     // Revert UI on error
+                     if (isLiked) {
+                         if (likeButtonTop) { likeButtonTop.classList.add('liked'); likeButtonTop.querySelector('.like-count').textContent = currentCountTop; }
+                         if (likeButtonBottom) { likeButtonBottom.classList.add('liked'); likeButtonBottom.querySelector('.like-count').textContent = currentCountBottom; }
+                     } else {
+                         if (likeButtonTop) { likeButtonTop.classList.remove('liked'); likeButtonTop.querySelector('.like-count').textContent = currentCountTop; }
+                         if (likeButtonBottom) { likeButtonBottom.classList.remove('liked'); likeButtonBottom.querySelector('.like-count').textContent = currentCountBottom; }
+                     }
+                }
+            } catch (error) {
+                 console.error("Error during toggle like article API call:", error);
+                 showMessage("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+                 // Revert UI on network error
+                 if (isLiked) {
+                      if (likeButtonTop) { likeButtonTop.classList.add('liked'); likeButtonTop.querySelector('.like-count').textContent = currentCountTop; }
+                      if (likeButtonBottom) { likeButtonBottom.classList.add('liked'); likeButtonBottom.querySelector('.like-count').textContent = currentCountBottom; }
+                 } else {
+                      if (likeButtonTop) { likeButtonTop.classList.remove('liked'); likeButtonTop.querySelector('.like-count').textContent = currentCountTop; }
+                      if (likeButtonBottom) { likeButtonBottom.classList.remove('liked'); likeButtonBottom.querySelector('.like-count').textContent = currentCountBottom; }
+                 }
+            } finally {
+                 if (likeButtonTop) likeButtonTop.disabled = false;
+                 if (likeButtonBottom) likeButtonBottom.disabled = false;
+            }
+        }
+
+        async function handleCommentLikeClick(event) {
+             if (!currentUser) {
+                 showMessage("กรุณาเข้าสู่ระบบเพื่อกดถูกใจความคิดเห็น", "error"); return;
+             }
+             const likeButton = event.currentTarget;
+             const commentId = likeButton.getAttribute('data-comment-id');
+             // Prevent liking optimistically added comments
+             if (!commentId || commentId.startsWith('temp-')) {
+                 console.log("Cannot like an optimistically added comment yet.");
+                 return;
+             }
+             const likeCountSpan = likeButton.querySelector('.like-count');
+             const isLiked = likeButton.classList.contains('liked');
+             const action = isLiked ? 'unlikeComment' : 'likeComment';
+             let currentCount = parseInt(likeCountSpan.textContent) || 0;
+
+             // Optimistically update UI
+             if (isLiked) {
+                 likeButton.classList.remove('liked');
+                 likeCountSpan.textContent = Math.max(0, currentCount - 1);
+             } else {
+                 likeButton.classList.add('liked');
+                 likeCountSpan.textContent = currentCount + 1;
+             }
+             likeButton.disabled = true;
+
+             try {
+                 // Do NOT show full screen loader for liking/unliking comment
+                 const data = await apiCall(action, 'POST', { commentId: commentId, username: currentUser.username }, {}, false); // showFullScreenLoader = false
+                 if (data.success) {
+                    // Update with actual count from backend
+                    likeCountSpan.textContent = data.likeCount;
+                    if (data.isLikedByCurrentUser) {
+                        likeButton.classList.add('liked');
+                    } else {
+                        likeButton.classList.remove('liked');
+                    }
+                    // Update cache for the current article's comments
+                    if (currentArticleId && cachedArticleDetails[currentArticleId]) {
+                         const comment = cachedArticleDetails[currentArticleId].comments.find(c => c.commentId === commentId);
+                         if (comment) {
+                             comment.likeCount = data.likeCount;
+                             comment.isLikedByCurrentUser = data.isLikedByCurrentUser;
+                         }
+                    }
+                    // No need to clear cachedArticles here for just a comment like count change
+                 } else {
+                      showMessage(data.error || "เกิดข้อผิดพลาดในการอัปเดตถูกใจความคิดเห็น", "error");
+                      // Revert UI on error
+                      if (isLiked) {
+                          likeButton.classList.add('liked'); likeCountSpan.textContent = currentCount;
+                      } else {
+                          likeButton.classList.remove('liked'); likeCountSpan.textContent = currentCount;
+                      }
+                 }
+             } catch (error) {
+                 console.error("Error during toggle like comment API call:", error);
+                 showMessage("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error");
+                 // Revert UI on network error
+                 if (isLiked) {
+                     likeButton.classList.add('liked'); likeCountSpan.textContent = currentCount;
+                 } else {
+                     likeButton.classList.remove('liked'); likeCountSpan.textContent = currentCount;
+                 }
+             } finally {
+                  likeButton.disabled = false;
+             }
+        }
+
+      
+        // Call the script when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOMContentLoaded fired. Running hideAdvertisementBanner.');
+            hideAdvertisementBanner();
+        });
+
+        // Use MutationObserver to detect changes in the DOM (e.g., new elements being added)
+        const observer = new MutationObserver(mutations => {
+            console.log('MutationObserver triggered.');
+            mutations.forEach(mutation => {
+                if (mutation.addedNodes.length > 0) {
+                    console.log('Nodes added. Re-running hideAdvertisementBanner.');
+                    // When new Nodes are added, try hiding the banner again
+                    hideAdvertisementBanner();
+                }
+            });
+        });
+
+        // Start observing changes in the document body
+        observer.observe(document.body, {
+            childList: true, // Observe direct child node additions/removals
+            subtree: true    // Observe changes in all descendant nodes (including nested ones)
+        });
+
+        // Call the script again when the entire page is fully loaded (including images and other resources)
+        window.addEventListener('load', () => {
+            console.log('Window load fired. Running hideAdvertisementBanner again.');
+            hideAdvertisementBanner();
+        });
+        // --- End Ad Blocker Script ---
+
+
+        function initializeApp() {
+            const storedUser = localStorage.getItem('currentUser');
+            if (storedUser) {
+                try { currentUser = JSON.parse(storedUser); }
+                catch (e) { localStorage.removeItem('currentUser'); currentUser = null; }
+            }
+            // Start broadcast update immediately
+            startBroadcastUpdate();
+
+            if (currentUser) {
+                 showView('home');
+            } else {
+                 showView('landing');
+            }
+            updateNav();
+        }
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>
