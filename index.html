@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>หัวจะปวด</title>
-	<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>😵‍💫</text></svg>">
+	<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤦‍♂️</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2.16.1/dist/easymde.min.css">
     <script src="https://cdn.jsdelivr.net/npm/easymde@2.16.1/dist/easymde.min.js"></script>
@@ -2152,56 +2152,98 @@
                        .substring(0,100); // Limit filename length
         }
 
-        // ฟังก์ชันสำหรับดาวน์โหลดบทความเป็น HTML พร้อมฝังรูปภาพ (ปรับปรุงแล้ว)
+        
+
+        // Function to format date (copied from existing code)
+        function formatDate(dateString) {
+            try {
+                const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+                // Ensure dateString is treated as UTC or adjust as needed
+                const date = new Date(dateString);
+                 if (isNaN(date.valueOf())) {
+                     console.warn("Invalid date string provided to formatDate:", dateString);
+                     return 'Invalid Date';
+                 }
+                 // Use toLocaleString with 'th-TH' locale for Thai formatting
+                return date.toLocaleString('th-TH', options);
+            } catch (e) {
+                console.error("Error formatting date:", dateString, e);
+                return 'Invalid Date';
+            }
+        }
+
+        // Function to sanitize HTML content for display (copied from existing code)
+        // Using DOMPurify for safety
+        function sanitizeHTML(html) {
+             if (!html) return '';
+             // Configure DOMPurify to allow necessary tags and attributes, including data URLs for images
+             return DOMPurify.sanitize(html, {
+                 USE_PROFILES: { html: true },
+                 ADD_TAGS: ['iframe', 'img', 'a', 'p', 'br', 'strong', 'em', 'del', 'code', 'pre', 'blockquote', 'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div'],
+                 ADD_ATTR: ['href', 'src', 'alt', 'title', 'width', 'height', 'class', 'style', 'id', 'loading', 'target', 'rel', 'allow', 'allowfullscreen', 'frameborder', 'scrolling', /^data-/, 'srcset', 'sizes'],
+                 ALLOW_DATA_ATTR: true // Explicitly allow data attributes, including data: URLs for src
+             });
+        }
+
+
+        /**
+         * Downloads an article as a self-contained HTML file with images embedded as Base64.
+         * Fetches article details (from cache or backend), converts Markdown to HTML,
+         * fetches external images via Google Apps Script, embeds them as data URLs,
+         * and triggers the download.
+         * @param {string} articleId The ID of the article to download.
+         */
         async function downloadArticleAsHTML(articleId) {
-            console.log("Starting downloadArticleAsHTML for articleId:", articleId); // เริ่มกระบวนการ downloadArticleAsHTML สำหรับ articleId:
+            console.log("Starting downloadArticleAsHTML for articleId:", articleId);
             if (!currentUser) {
-                 showMessage("กรุณาเข้าสู่ระบบเพื่อดาวน์โหลดบทความ", "error"); // แสดงข้อความ: กรุณาเข้าสู่ระบบเพื่อดาวน์โหลดบทความ
-                 console.log("Download aborted: User not logged in."); // การดาวน์โหลดถูกยกเลิก: ผู้ใช้ยังไม่ได้เข้าสู่ระบบ
+                 showMessage("กรุณาเข้าสู่ระบบเพื่อดาวน์โหลดบทความ", "error");
+                 console.log("Download aborted: User not logged in.");
                  return;
             }
             if (!articleId) {
-                console.error("No articleId provided for downloadArticleAsHTML"); // ไม่ได้ระบุ articleId สำหรับ downloadArticleAsHTML
-                showMessage("เกิดข้อผิดพลาด: ไม่พบ ID บทความ", "error"); // แสดงข้อความ: เกิดข้อผิดพลาด: ไม่พบ ID บทความ
-                console.log("Download aborted: No article ID."); // การดาวน์โหลดถูกยกเลิก: ไม่มี ID บทความ
+                console.error("No articleId provided for downloadArticleAsHTML");
+                showMessage("เกิดข้อผิดพลาด: ไม่พบ ID บทความ", "error");
+                console.log("Download aborted: No article ID.");
                 return;
             }
 
-            // แสดงสถานะกำลังโหลดสำหรับกระบวนการทั้งหมด
+            // Show loading indicator for the entire process
             showLoading(true);
-            console.log("Showing loading modal."); // แสดง modal กำลังโหลด
+            console.log("Showing loading modal.");
 
             try {
-                // ตรวจสอบแคชสำหรับเนื้อหาบทความเพื่อดาวน์โหลดก่อน
+                // Check cache first for article content
                 let article = cachedArticleDetails[articleId];
-                console.log("Checking cache for article:", articleId, "Cached:", !!article); // ตรวจสอบแคชสำหรับบทความ: articleId, มีในแคชหรือไม่: true/false
+                console.log("Checking cache for article:", articleId, "Cached:", !!article);
 
-                // หากไม่มีในแคช หรือแคชไม่สมบูรณ์ ให้ดึงข้อมูลจาก backend
+                // If not in cache or incomplete, fetch from backend
                 if (!article || !article.contentMarkdown) {
-                     console.log("Article not in cache or incomplete. Fetching from backend."); // บทความไม่อยู่ในแคชหรือไม่สมบูรณ์ กำลังดึงข้อมูลจาก backend
+                     console.log("Article not in cache or incomplete. Fetching from backend.");
                      try {
-                         // ใช้ apiCall ที่มีอยู่เพื่อดึงรายละเอียดบทความ
-                         const data = await apiCall('getArticle', 'GET', null, { articleId, username: currentUser ? currentUser.username : '' }, false); // การโหลดจะถูกจัดการโดย logic ภายนอก
-                         if (data.success && data.article) {
+                         // Use apiCall to fetch article details
+                         // Ensure your apiCall function correctly handles GET requests and parameters
+                         const data = await apiCall('getArticle', 'GET', null, { articleId: articleId, username: currentUser ? currentUser.username : '' }, false); // showFullScreenLoader handled by outer logic
+                         console.log("apiCall result for getArticle:", data);
+                         if (data && data.success && data.article) {
                              article = data.article;
-                             cachedArticleDetails[articleId] = data.article; // แคชข้อมูลที่ดึงมา
-                             console.log("Successfully fetched article from backend."); // ดึงข้อมูลบทความจาก backend สำเร็จ
+                             cachedArticleDetails[articleId] = data.article; // Cache the fetched data
+                             console.log("Successfully fetched article from backend.");
                          } else {
-                             // หาก API ส่งข้อผิดพลาดหรือไม่พบบทความ ให้ล้างแคชและแสดงข้อผิดพลาด
+                             // If API returns error or no article, clear cache and show error
                              delete cachedArticleDetails[articleId];
-                             showMessage(data.error || "ไม่พบบทความสำหรับดาวน์โหลด", "error"); // แสดงข้อความ: ไม่พบบทความสำหรับดาวน์โหลด
-                             console.error("Failed to fetch article from backend:", data.error); // ไม่สามารถดึงข้อมูลบทความจาก backend: ข้อผิดพลาด
-                             return; // ออกจากฟังก์ชันเมื่อเกิดข้อผิดพลาด
+                             showMessage(data?.error || "ไม่พบบทความสำหรับดาวน์โหลด", "error");
+                             console.error("Failed to fetch article from backend:", data?.error);
+                             return; // Exit function on error
                          }
                      } catch (error) {
-                         console.error("Error fetching article detail for download:", error); // เกิดข้อผิดพลาดในการดึงรายละเอียดบทความเพื่อดาวน์โหลด: ข้อผิดพลาด
-                         showMessage("เกิดข้อผิดพลาดในการโหลดบทความสำหรับดาวน์โหลด: " + error.message, "error"); // แสดงข้อผิดพลาดในการโหลดบทความ
-                         return; // ออกจากฟังก์ชันเมื่อเกิดข้อผิดพลาด
+                         console.error("Error fetching article detail for download:", error);
+                         showMessage("เกิดข้อผิดพลาดในการโหลดบทความสำหรับดาวน์โหลด: " + error.message, "error");
+                         return; // Exit function on error
                      }
                 }
 
-                // เมื่อได้เนื้อหาบทความแล้ว (จากแคชหรือการดึงข้อมูล) ให้ดำเนินการฝังรูปภาพต่อ
-                console.log("Article content available. Proceeding with image embedding."); // เนื้อหาบทความพร้อมใช้งาน กำลังดำเนินการฝังรูปภาพ
+                // Once article content is available (from cache or fetch), proceed with image embedding
+                console.log("Article content available. Proceeding with image embedding.");
 
                 const title = article.title || 'บทความ';
                 const contentMarkdown = article.contentMarkdown || '';
@@ -2209,93 +2251,133 @@
                 const publishDate = article.publishDate;
                 const lastUpdatedDate = article.lastUpdatedDate;
 
-                // แปลง Markdown เป็น HTML โดยใช้ marked.js
+                // Convert Markdown to HTML using marked.js
                 let htmlContent = marked.parse(contentMarkdown, { breaks: true });
-                console.log("Markdown converted to HTML."); // แปลง Markdown เป็น HTML แล้ว
+                console.log("Markdown converted to HTML. Initial HTML length:", htmlContent.length);
 
-                // ค้นหาแท็กรูปภาพทั้งหมดในเนื้อหา HTML
+                // Find all image tags in the HTML content
                 const imagesToEmbed = [];
-                const imgRegex = /<img\s+[^>]*src="([^"]*)"[^>]*>/ig;
+                // Updated regex to be more robust
+                const imgRegex = /<img\s+[^>]*src=["']([^"']*)["'][^>]*>/ig;
                 let match;
+
+                // Use a temporary variable to build the modified HTML
+                let modifiedHtmlContent = htmlContent;
+                console.log("Scanning for images to embed...");
+
+                // Collect images first
                 while ((match = imgRegex.exec(htmlContent)) !== null) {
                     const originalImgTag = match[0];
                     const imageUrl = match[1];
-                    // ประมวลผลเฉพาะรูปภาพที่มี URL เป็น http/https และไม่ใช่ data URL หรือ placeholder
+                     console.log("Found potential image tag:", originalImgTag, "URL:", imageUrl);
+                    // Process only images with http/https URLs that are not data URLs or placeholders
                     if (imageUrl && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) && !imageUrl.startsWith('data:') && !imageUrl.includes('placehold.co')) {
                         imagesToEmbed.push({ originalTag: originalImgTag, url: imageUrl });
-                        console.log("Found image URL to embed:", imageUrl); // พบ URL รูปภาพที่จะฝัง:
+                        console.log("Added image URL to embedding list:", imageUrl);
                     } else if (imageUrl && (imageUrl.startsWith('data:') || imageUrl.includes('placehold.co'))) {
-                        console.log("Skipping data URL or placeholder image:", imageUrl.substring(0, 50) + "..."); // ข้าม data URL หรือรูปภาพ placeholder:
+                        console.log("Skipping data URL or placeholder image:", imageUrl.substring(0, 50) + "...");
                     } else {
-                         console.log("Skipping invalid or empty image URL:", imageUrl); // ข้าม URL รูปภาพที่ไม่ถูกต้องหรือว่างเปล่า:
+                         console.log("Skipping invalid or empty image URL:", imageUrl);
                     }
                 }
-                console.log(`Found ${imagesToEmbed.length} external images to potentially embed.`); // พบรูปภาพภายนอก ${imagesToEmbed.length} รูปที่จะฝัง
+                console.log(`Found ${imagesToEmbed.length} external images to potentially embed.`);
 
 
-                // ดึงรูปภาพเป็น Base64 และแทนที่ใน HTML
+                // Fetch images as Base64 and replace in HTML using google.script.run
                 if (imagesToEmbed.length > 0) {
-                    console.log(`Starting process to fetch and embed ${imagesToEmbed.length} images.`); // เริ่มกระบวนการดึงและฝังรูปภาพ ${imagesToEmbed.length} รูป
-                    // ใช้ Promise.all เพื่อรอให้การดึงรูปภาพทั้งหมดเสร็จสิ้น
-                    const imgPromises = imagesToEmbed.map(imgInfo =>
-                        // ใช้ฟังก์ชัน apiCall ที่มีอยู่เพื่อร้องขอให้ backend ดึงรูปภาพ
-                        apiCall('fetchImageAsBase64', 'GET', null, { imageUrl: imgInfo.url }, false) // ไม่ต้องแสดง loader สำหรับแต่ละรูปภาพ
-                        .then(r => {
-                            console.log("Received response for image:", imgInfo.url.substring(0, 50) + "...", "Success:", r?.success); // ได้รับการตอบกลับสำหรับรูปภาพ: ..., สำเร็จ: true/false
-                            if (r && r.success && r.base64Data && r.contentType) {
-                                const dataUrl = `data:${r.contentType};base64,${r.base64Data}`;
-                                // แทนที่แท็ก img เดิมด้วยแท็กใหม่ที่มี data URL
-                                // ใช้ split/join เพื่อการแทนที่ที่แข็งแรง
-                                // คง attribute style เดิมไว้ แต่ให้แน่ใจว่ามี max-width: 100%
-                                const updatedImgTag = imgInfo.originalTag.replace(/src="[^"]*"/, `src="${dataUrl}"`).replace(/style="([^"]*)"/, (match, styleContent) => {
-                                     // เพิ่ม max-width: 100% หากยังไม่มี และตรวจสอบให้แน่ใจว่ามี display: block และ margin
-                                     let newStyle = styleContent;
-                                     if (!newStyle.includes('max-width')) newStyle += '; max-width: 100%;';
-                                     if (!newStyle.includes('height: auto')) newStyle += '; height: auto;'; // ตรวจสอบให้แน่ใจว่ารักษาสัดส่วนภาพ
-                                     if (!newStyle.includes('display: block')) newStyle += '; display: block;';
-                                     if (!newStyle.includes('margin')) newStyle += '; margin: 1.5em auto;'; // จัดรูปภาพให้อยู่กึ่งกลาง
-                                     return `style="${newStyle.trim()}"`;
-                                }).replace(/<img\s+/, '<img alt="Embedded Image" '); // เพิ่ม alt text เริ่มต้นหากไม่มี
+                    console.log(`Starting process to fetch and embed ${imagesToEmbed.length} images via google.script.run.`);
+                    // Create an array of promises for fetching each image using google.script.run
+                    const imgPromises = imagesToEmbed.map(imgInfo => new Promise(resolve => {
+                        // Check if google.script.run and the function are available
+                         if (typeof google === 'undefined' || !google.script || !google.script.run || typeof google.script.run.fetchImageAsBase64 !== 'function') {
+                             console.error("google.script.run API is not available or fetchImageAsBase64 is not exposed.");
+                             console.warn(`Failed to embed image from ${imgInfo.url}: google.script.run not available.`);
+                             // Keep the original tag if embedding failed
+                             resolve(); // Resolve the promise to avoid blocking
+                             return;
+                         }
 
-                                htmlContent = htmlContent.split(imgInfo.originalTag).join(updatedImgTag);
-                                console.log(`Successfully embedded image from ${imgInfo.url.substring(0, 50)}...`); // ฝังรูปภาพจาก ... สำเร็จ
-                            } else {
-                                console.warn(`Failed to embed image from ${imgInfo.url}: ${r?.error || 'Unknown error'}`); // ไม่สามารถฝังรูปภาพจาก ...: ข้อผิดพลาดหรือไม่ทราบสาเหตุ
-                                // คงแท็กเดิมไว้หากการฝังล้มเหลว
-                            }
-                        })
-                        .catch(err => {
-                            console.error(`Error during fetchImageAsBase64 API call for ${imgInfo.url}:`, err); // เกิดข้อผิดพลาดระหว่างการเรียก API fetchImageAsBase64 สำหรับ ...: ข้อผิดพลาด
-                            // คงแท็กเดิมไว้เมื่อเกิดข้อผิดพลาดทางเครือข่าย
-                        })
-                    );
-                     // รอให้ promise การดึงรูปภาพทั้งหมดได้รับการแก้ไข
+                        google.script.run
+                            .withSuccessHandler(r => {
+                                console.log(`Received response for ${imgInfo.url}:`, r);
+                                // If fetching was successful and returned data
+                                if (r && r.success && r.base64Data && r.contentType) {
+                                    const dataUrl = `data:${r.contentType};base64,${r.base64Data}`;
+                                    console.log(`Generated data URL for ${imgInfo.url.substring(0, 50)}...`);
+                                    // Replace the original image tag with a new one using the data URL
+                                    // Use a more reliable replacement method if regex replacement is problematic
+                                    // A simple string replace might replace multiple occurrences if originalTag is not unique
+                                    // A better approach is to build the HTML piece by piece or use a DOM parser,
+                                    // but for simplicity, let's try a robust string replacement first.
+
+                                    // Ensure original attributes like style are preserved and add/override necessary styles
+                                    const updatedImgTag = imgInfo.originalTag
+                                        .replace(/src=["'][^"']*["']/, `src="${dataUrl}"`) // Replace src with data URL
+                                        .replace(/<img\s+/, '<img alt="Embedded Image" '); // Add default alt text if none exists
+
+                                    // Check if style attribute exists and add/modify
+                                    if (!updatedImgTag.includes('style=')) {
+                                         // Add a new style attribute
+                                         modifiedHtmlContent = modifiedHtmlContent.split(imgInfo.originalTag).join(updatedImgTag.replace(/>$/, ' style="max-width: 100%; height: auto; display: block; margin: 1.5em auto;">'));
+                                    } else {
+                                         // Modify existing style attribute
+                                         modifiedHtmlContent = modifiedHtmlContent.split(imgInfo.originalTag).join(updatedImgTag.replace(/style=["']([^"']*)["']/, (match, styleContent) => {
+                                             let newStyle = styleContent;
+                                             if (!newStyle.includes('max-width')) newStyle += '; max-width: 100%;';
+                                             if (!newStyle.includes('height: auto')) newStyle += '; height: auto;'; // Ensure aspect ratio is maintained
+                                             if (!newStyle.includes('display: block')) newStyle += '; display: block;';
+                                             if (!newStyle.includes('margin')) newStyle += '; margin: 1.5em auto;'; // Center the image
+                                             return `style="${newStyle.trim()}"`;
+                                         }));
+                                    }
+
+                                    console.log(`Successfully replaced original tag with embedded image tag for ${imgInfo.url.substring(0, 50)}...`);
+
+                                } else {
+                                    // Log a warning if fetching/embedding failed
+                                    console.warn(`Failed to embed image from ${imgInfo.url}: ${r?.error || 'Unknown error from backend'}`);
+                                    // Keep the original tag if embedding failed
+                                }
+                                resolve(); // Resolve the promise regardless of success/failure to continue
+                            })
+                            .withFailureHandler(err => {
+                                // Log a server error if the Apps Script call failed
+                                console.error(`Server error fetching image ${imgInfo.url}:`, err);
+                                console.warn(`Failed to embed image from ${imgInfo.url}: Server error.`);
+                                // Keep the original tag on failure
+                                resolve(); // Resolve the promise on failure
+                            })
+                            .fetchImageAsBase64(imgInfo.url); // Call the backend function
+                    }));
+                     // Wait for all image fetching promises to complete
                     try {
+                         console.log("Waiting for image embedding promises to complete...");
                          await Promise.all(imgPromises);
-                         console.log("Finished processing all image embedding promises."); // ประมวลผล promise การฝังรูปภาพทั้งหมดเสร็จสิ้น
+                         console.log("Finished processing all image embedding promises.");
                     } catch (promiseError) {
-                         console.error("Error waiting for image promises to resolve:", promiseError); // เกิดข้อผิดพลาดในการรอ promise รูปภาพ: ข้อผิดพลาด
-                         // ดำเนินการดาวน์โหลดต่อแม้ว่ารูปภาพบางรูปจะฝังไม่สำเร็จ
+                         console.error("Error waiting for image promises to resolve:", promiseError);
+                         // Continue with download even if some images failed to embed
                     }
 
                 } else {
-                    console.log("No external images found to embed. Skipping embedding process."); // ไม่พบรูปภาพภายนอกที่จะฝัง ข้ามกระบวนการฝัง
+                    console.log("No external images found to embed. Skipping embedding process.");
                 }
 
-                // ทำความสะอาดเนื้อหา HTML สุดท้ายก่อนที่จะครอบด้วยโครงสร้าง HTML
-                 const sanitizedHtmlContent = DOMPurify.sanitize(htmlContent, {
+                // Sanitize the final HTML content before wrapping it
+                 // Use the potentially modified HTML content
+                 const sanitizedHtmlContent = DOMPurify.sanitize(modifiedHtmlContent, {
                       USE_PROFILES: { html: true },
                       ADD_TAGS: ['iframe', 'img', 'a', 'p', 'br', 'strong', 'em', 'del', 'code', 'pre', 'blockquote', 'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div'],
                       ADD_ATTR: ['href', 'src', 'alt', 'title', 'width', 'height', 'class', 'style', 'id', 'loading', 'target', 'rel', 'allow', 'allowfullscreen', 'frameborder', 'scrolling', /^data-/, 'srcset', 'sizes'],
-                      ALLOW_DATA_ATTR: true
+                      ALLOW_DATA_ATTR: true // Ensure data URLs are allowed by DOMPurify
                  });
-                 console.log("HTML content sanitized."); // เนื้อหา HTML ผ่านการทำความสะอาดแล้ว
+                 console.log("HTML content sanitized. Sanitized HTML length:", sanitizedHtmlContent.length);
 
 
                 const formattedPublishDate = publishDate ? formatDate(publishDate) : 'N/A';
                 const formattedUpdatedDate = (lastUpdatedDate && lastUpdatedDate !== publishDate) ? ` | แก้ไขล่าสุด: ${formatDate(lastUpdatedDate)}` : '';
 
-                 // กำหนด CSS แบบ inline สำหรับ HTML ที่ดาวน์โหลด
+                 // Define inline CSS for the downloaded HTML
                  const inlineCss = `
                      body { font-family: 'Inter', 'Kanit', sans-serif; line-height: 1.6; margin: 0; background-color: #f7fafc; color: #2d3748; }
                      .article-container { background-color: #ffffff; padding: 25px 35px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); max-width: 800px; margin: 20px auto; border: 1px solid #e2e8f0; }
@@ -2343,14 +2425,15 @@
 						</div>
 					</body>
 					</html>`;
-                console.log("Full HTML document generated."); // สร้างเอกสาร HTML ฉบับเต็มแล้ว
+                console.log("Full HTML document generated. Final HTML length:", fullHtml.length);
 
-                // ซ่อนสถานะกำลังโหลดก่อนแสดง prompt ดาวน์โหลด
+                // Hide loading state before prompting download
                 showLoading(false);
-                console.log("Hiding loading modal."); // ซ่อน modal กำลังโหลด
+                console.log("Hiding loading modal.");
 
+                // Trigger the download of the generated HTML file
                 try {
-                    console.log("Attempting to create Blob and download."); // พยายามสร้าง Blob และดาวน์โหลด
+                    console.log("Attempting to create Blob and download.");
                     const blob = new Blob([fullHtml], { type: 'text/html;charset=UTF-8' });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
@@ -2359,24 +2442,26 @@
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
-                    URL.revokeObjectURL(url); // ทำความสะอาด object URL
-                    showMessage('สร้างไฟล์ HTML สำเร็จ!', 'info'); // แสดงข้อความ: สร้างไฟล์ HTML สำเร็จ!
-                    console.log("Download initiated successfully."); // เริ่มการดาวน์โหลดสำเร็จ
+                    URL.revokeObjectURL(url); // Clean up the object URL
+                    showMessage('สร้างไฟล์ HTML สำเร็จ!', 'info');
+                    console.log("Download initiated successfully.");
                 } catch (error) {
-                    console.error("Error during HTML download process:", error); // เกิดข้อผิดพลาดระหว่างกระบวนการดาวน์โหลด HTML: ข้อผิดพลาด
-                    showMessage('ดาวน์โหลด HTML ผิดพลาด: ' + error.message, 'error'); // แสดงข้อความ: ดาวน์โหลด HTML ผิดพลาด
+                    console.error("Error during HTML download process:", error);
+                    showMessage('ดาวน์โหลด HTML ผิดพลาด: ' + error.message, 'error');
                 }
 
             } catch (error) {
-                 // บล็อก catch นี้จัดการข้อผิดพลาดระหว่างการดึงข้อมูลบทความเริ่มต้นหรือกระบวนการฝังรูปภาพ
-                 console.error("Error during download process:", error); // เกิดข้อผิดพลาดระหว่างกระบวนการดาวน์โหลด: ข้อผิดพลาด
-                 showMessage('เกิดข้อผิดพลาดระหว่างการดาวน์โหลด: ' + error.message, 'error'); // แสดงข้อความ: เกิดข้อผิดพลาดระหว่างการดาวน์โหลด
+                 // This catch block handles errors during the initial article fetch or image embedding process
+                 console.error("Error during download process:", error);
+                 showMessage('เกิดข้อผิดพลาดระหว่างการดาวน์โหลด: ' + error.message, 'error');
             } finally {
-                 // ตรวจสอบให้แน่ใจว่าสถานะกำลังโหลดถูกซ่อนแม้ว่าจะเกิดข้อผิดพลาด
+                 // Ensure loading state is hidden even if errors occur
                  showLoading(false);
-                 console.log("Ensuring loading modal is hidden in finally block."); // ตรวจสอบให้แน่ใจว่า modal กำลังโหลดถูกซ่อนในบล็อก finally
+                 console.log("Ensuring loading modal is hidden in finally block.");
             }
         }
+
+
 
 
 
